@@ -83,6 +83,15 @@ gridappsd_docker = {
        '/data/gridappsd_testing/entrypoint.sh': {'bind': '/gridappsd/entrypoint.sh', 'mode': 'rw'}
     },
     'entrypoint': '',
+  },
+  'viz': {
+    'start': True,
+    'image': 'gridappsd/viz:develop',
+    'pull': True,
+    'ports': {'8082/tcp': 8080},
+    'environment': '',
+    'volumes': '',
+    'entrypoint': '',
   }
 }
 
@@ -117,9 +126,10 @@ for service, value in gridappsd_docker.items():
     print ("Starting %s : %s" % ( service, gridappsd_docker[service]['image']))
     kwargs = {} 
     kwargs['image'] = gridappsd_docker[service]['image']
+    # Only name the containers if remove is on
+    kwargs['remove'] = True
     kwargs['name'] = service
     kwargs['detach'] = True
-    kwargs['remove'] = False
     if gridappsd_docker[service]['environment']:   
       kwargs['environment'] = gridappsd_docker[service]['environment']
     if gridappsd_docker[service]['ports']:   

@@ -13,7 +13,7 @@ if [ "$1" = "gridappsd" ]; then
 
   if [ "$START:-0}" != "0" ]; then
     echo "[Entrypoint] Starting the platorm"
-    /gridappsd/run-gridappsd.sh &
+    /gridappsd/run-gridappsd.sh > /tmp/output 2>&1 &
   fi
   # Run tail -f /dev/null to keep the container running and waiting for connection
   echo "[Entrypoint] Waiting for connection"
