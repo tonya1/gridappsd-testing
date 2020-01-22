@@ -2,6 +2,7 @@
 
 import docker
 import os
+import re
 import shutil
 import time
 import urllib.request
@@ -27,7 +28,7 @@ gridappsd_docker = {
     'volumes': {
        '/data/docker/gridappsd_testing/gridappsd/redis/data': {'bind': '/data', 'mode': 'rw'}
      },
-    'entrypoint': 'redis-server -appendonly yes',
+    'entrypoint': 'redis-server --appendonly yes',
   },
   'blazegraph': {
     'start': True,
@@ -51,7 +52,7 @@ gridappsd_docker = {
     'links': '',
     'volumes': {
        '/data/docker/gridappsd_testing/gridappsd/mysql': {'bind': '/var/lib/mysql', 'mode': 'rw'},
-       '/data/docker/gridappsd_testing/dumps/gridappsdmysql_dump.sql': {'bind': '/docker-entrypoint-initdb.d/schema.sql', 'mode': 'ro'}
+       '/data/docker/gridappsd_testing/dumps/gridappsd_mysql_dump.sql': {'bind': '/docker-entrypoint-initdb.d/schema.sql', 'mode': 'ro'}
     },
     'entrypoint': '',
   },
@@ -84,7 +85,7 @@ gridappsd_docker = {
       "DEBUG": 1,
       "START": 1
     },
-    'links': {'mysql': 'mysql'},
+    'links': {'mysql': 'mysql', 'influxdb': 'influxdb', 'blazegraph': 'blazegraph', 'proven': 'proven', 'redis': 'redis'},
     'volumes': {
        '/data/gridappsd_testing/entrypoint.sh': {'bind': '/gridappsd/entrypoint.sh', 'mode': 'rw'}
     },
@@ -110,23 +111,34 @@ for container in client.containers.list():
   container.stop()  
   time.sleep(5)
 
+data_dir = '/data/docker/gridappsd_testing'
+
 print ("\nRemoving previous data")
-path='/data/docker/gridappsd_testing/gridappsd'
+path='{}/gridappsd'.format(data_dir)
 if os.path.isdir(path): 
   shutil.rmtree(path, ignore_errors=False, onerror=None)
 
 # Downlaod mysql file
 print ("\nDownloading mysql file")
-if not os.path.isdir("/data/docker/gridappsd_testing/dumps"): 
-  os.makedirs('/data/docker/gridappsd_testing/dumps', 0o0775 )
-urllib.request.urlretrieve('https://raw.githubusercontent.com/GRIDAPPSD/Bootstrap/master/gridappsd_mysql_dump.sql', filename='/data/docker/gridappsd_testing/dumps/gridappsd_mysql_dump.sql')
+mysql_dir = '{}/dumps'.format(data_dir)
+mysql_file = '{}/gridappsd_mysql_dump.sql'.format(mysql_dir)
+if not os.path.isdir(mysql_dir): 
+  os.makedirs(mysql_dir, 0o0775 )
+urllib.request.urlretrieve('https://raw.githubusercontent.com/GRIDAPPSD/Bootstrap/master/gridappsd_mysql_dump.sql', filename = mysql_file)
+
+# Modify the mysql file to allow connections from gridappsd container
+with open(mysql_file, "r") as sources:
+    lines = sources.readlines()
+with open(mysql_file, "w") as sources:
+    for line in lines:
+        sources.write(re.sub(r'localhost', '%', line))
 
 # Pull the container
-print ("\n")
-for service, value in gridappsd_docker.items():
-  if gridappsd_docker[service]['pull']:
-    print ("Pulling %s : %s" % ( service, gridappsd_docker[service]['image']))
-    image = client.images.pull(gridappsd_docker[service]['image'])
+#print ("\n")
+#for service, value in gridappsd_docker.items():
+#  if gridappsd_docker[service]['pull']:
+#    print ("Pulling %s : %s" % ( service, gridappsd_docker[service]['image']))
+#    image = client.images.pull(gridappsd_docker[service]['image'])
 
 # Start the container
 print ("\n")
@@ -149,7 +161,7 @@ for service, value in gridappsd_docker.items():
       kwargs['entrypoint'] = gridappsd_docker[service]['entrypoint']
     if gridappsd_docker[service]['links']:
       kwargs['links'] = gridappsd_docker[service]['links']
-    print (kwargs)
+    #print (kwargs)
     container = client.containers.run(**kwargs)
     gridappsd_docker[service]['containerid'] = container.id
 
