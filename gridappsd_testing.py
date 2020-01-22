@@ -13,6 +13,7 @@ gridappsd_docker = {
     'pull': True,
     'ports': {'8086/tcp': 8086},
     'environment': {"INFLUXDB_DB": "proven"},
+    'links': '',
     'volumes': '',
     'entrypoint': '',
   }, 
@@ -22,8 +23,9 @@ gridappsd_docker = {
     'pull': True,
     'ports': {'6379/tcp': 6379},
     'environment': [],
+    'links': '',
     'volumes': {
-       '/data/gridappsd_testing/gridappsd/redis/data': {'bind': '/data', 'mode': 'rw'}
+       '/data/docker/gridappsd_testing/gridappsd/redis/data': {'bind': '/data', 'mode': 'rw'}
      },
     'entrypoint': 'redis-server -appendonly yes',
   },
@@ -33,6 +35,7 @@ gridappsd_docker = {
     'pull': True,
     'ports': {'8080/tcp': 8889},
     'environment': [],
+    'links': '',
     'volumes': '',
     'entrypoint': '',
   },
@@ -45,9 +48,10 @@ gridappsd_docker = {
        "MYSQL_RANDOM_ROOT_PASSWORD": "yes",
        "MYSQL_PORT": '3306'
     },
+    'links': '',
     'volumes': {
-       '/data/gridappsd_testing/gridappsd/mysql': {'bind': '/var/lib/mysql', 'mode': 'rw'},
-       '/data/gridappsd_testing/dumps/gridappsdmysql_dump.sql': {'bind': '/docker-entrypoint-initdb.d/schema.sql', 'mode': 'ro'}
+       '/data/docker/gridappsd_testing/gridappsd/mysql': {'bind': '/var/lib/mysql', 'mode': 'rw'},
+       '/data/docker/gridappsd_testing/dumps/gridappsdmysql_dump.sql': {'bind': '/docker-entrypoint-initdb.d/schema.sql', 'mode': 'ro'}
     },
     'entrypoint': '',
   },
@@ -66,6 +70,7 @@ gridappsd_docker = {
       "PROVEN_IDB_USERNAME": "root",
       "PROVEN_IDB_PASSWORD": "root",
       "PROVEN_T3DIR":"/proven"},
+    'links': '',
     'volumes': '',
     'entrypoint': '',
   },
@@ -79,6 +84,7 @@ gridappsd_docker = {
       "DEBUG": 1,
       "START": 1
     },
+    'links': {'mysql': 'mysql'},
     'volumes': {
        '/data/gridappsd_testing/entrypoint.sh': {'bind': '/gridappsd/entrypoint.sh', 'mode': 'rw'}
     },
@@ -90,6 +96,7 @@ gridappsd_docker = {
     'pull': True,
     'ports': {'8082/tcp': 8080},
     'environment': '',
+    'links': '',
     'volumes': '',
     'entrypoint': '',
   }
@@ -104,24 +111,26 @@ for container in client.containers.list():
   time.sleep(5)
 
 print ("\nRemoving previous data")
-path='/data/gridappsd_testing/gridappsd'
+path='/data/docker/gridappsd_testing/gridappsd'
 if os.path.isdir(path): 
   shutil.rmtree(path, ignore_errors=False, onerror=None)
 
-#Downlaod mysql file
+# Downlaod mysql file
 print ("\nDownloading mysql file")
-if not os.path.isdir("/data/gridappsd_testing/dumps"): 
-  os.mkdir('/data/gridappsd_testing/dumps', 0o0775 )
-urllib.request.urlretrieve('https://raw.githubusercontent.com/GRIDAPPSD/Bootstrap/master/gridappsd_mysql_dump.sql', filename='/data/gridappsd_testing/dumps/gridappsd_mysql_dump.sql')
+if not os.path.isdir("/data/docker/gridappsd_testing/dumps"): 
+  os.makedirs('/data/docker/gridappsd_testing/dumps', 0o0775 )
+urllib.request.urlretrieve('https://raw.githubusercontent.com/GRIDAPPSD/Bootstrap/master/gridappsd_mysql_dump.sql', filename='/data/docker/gridappsd_testing/dumps/gridappsd_mysql_dump.sql')
 
+# Pull the container
+print ("\n")
 for service, value in gridappsd_docker.items():
-  # Pull the container
   if gridappsd_docker[service]['pull']:
     print ("Pulling %s : %s" % ( service, gridappsd_docker[service]['image']))
     image = client.images.pull(gridappsd_docker[service]['image'])
 
+# Start the container
+print ("\n")
 for service, value in gridappsd_docker.items():
-  # Start the container
   if gridappsd_docker[service]['start']:
     print ("Starting %s : %s" % ( service, gridappsd_docker[service]['image']))
     kwargs = {} 
@@ -138,14 +147,16 @@ for service, value in gridappsd_docker.items():
       kwargs['volumes'] = gridappsd_docker[service]['volumes']
     if gridappsd_docker[service]['entrypoint']:   
       kwargs['entrypoint'] = gridappsd_docker[service]['entrypoint']
-    #print (kwargs)
+    if gridappsd_docker[service]['links']:
+      kwargs['links'] = gridappsd_docker[service]['links']
+    print (kwargs)
     container = client.containers.run(**kwargs)
     gridappsd_docker[service]['containerid'] = container.id
 
 time.sleep(30)
 
-print("\n")
 # List all running containers
+print("\n")
 print ("\n\nList all containers")
 for container in client.containers.list():
   print (container.name)
