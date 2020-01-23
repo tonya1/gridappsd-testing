@@ -87,7 +87,8 @@ gridappsd_docker = {
     },
     'links': {'mysql': 'mysql', 'influxdb': 'influxdb', 'blazegraph': 'blazegraph', 'proven': 'proven', 'redis': 'redis'},
     'volumes': {
-       '/data/gridappsd_testing/entrypoint.sh': {'bind': '/gridappsd/entrypoint.sh', 'mode': 'rw'}
+       '/data/gridappsd_testing/entrypoint.sh': {'bind': '/gridappsd/entrypoint.sh', 'mode': 'rw'},
+       '/data/gridappsd_testing/run-gridappsd.sh': {'bind': '/gridappsd/run-gridappsd.sh', 'mode': 'rw'}
     },
     'entrypoint': '',
   },
