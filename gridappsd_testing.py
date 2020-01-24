@@ -7,6 +7,13 @@ import shutil
 import time
 import urllib.request
 
+
+## Edit these two paths ##
+# Location of the cloned repository
+repo_dir = '/data/gridappsd_testing'
+# Location for output data
+data_dir = '/data/docker/gridappsd_testing'
+
 gridappsd_docker = { 
   'influxdb': {
     'start': True,
@@ -26,7 +33,7 @@ gridappsd_docker = {
     'environment': [],
     'links': '',
     'volumes': {
-       '/data/docker/gridappsd_testing/gridappsd/redis/data': {'bind': '/data', 'mode': 'rw'}
+       data_dir + '/gridappsd/redis/data': {'bind': '/data', 'mode': 'rw'}
      },
     'entrypoint': 'redis-server --appendonly yes',
   },
@@ -51,8 +58,8 @@ gridappsd_docker = {
     },
     'links': '',
     'volumes': {
-       '/data/docker/gridappsd_testing/gridappsd/mysql': {'bind': '/var/lib/mysql', 'mode': 'rw'},
-       '/data/docker/gridappsd_testing/dumps/gridappsd_mysql_dump.sql': {'bind': '/docker-entrypoint-initdb.d/schema.sql', 'mode': 'ro'}
+       data_dir + '/gridappsd/mysql': {'bind': '/var/lib/mysql', 'mode': 'rw'},
+       data_dir + '/dumps/gridappsd_mysql_dump.sql': {'bind': '/docker-entrypoint-initdb.d/schema.sql', 'mode': 'ro'}
     },
     'entrypoint': '',
   },
@@ -71,7 +78,7 @@ gridappsd_docker = {
       "PROVEN_IDB_USERNAME": "root",
       "PROVEN_IDB_PASSWORD": "root",
       "PROVEN_T3DIR":"/proven"},
-    'links': '',
+    'links': {'influxdb': 'influxdb'},
     'volumes': '',
     'entrypoint': '',
   },
@@ -87,19 +94,9 @@ gridappsd_docker = {
     },
     'links': {'mysql': 'mysql', 'influxdb': 'influxdb', 'blazegraph': 'blazegraph', 'proven': 'proven', 'redis': 'redis'},
     'volumes': {
-       '/data/gridappsd_testing/entrypoint.sh': {'bind': '/gridappsd/entrypoint.sh', 'mode': 'rw'},
-       '/data/gridappsd_testing/run-gridappsd.sh': {'bind': '/gridappsd/run-gridappsd.sh', 'mode': 'rw'}
+       repo_dir + '/conf/entrypoint.sh': {'bind': '/gridappsd/entrypoint.sh', 'mode': 'rw'},
+       repo_dir + '/conf/run-gridappsd.sh': {'bind': '/gridappsd/run-gridappsd.sh', 'mode': 'rw'}
     },
-    'entrypoint': '',
-  },
-  'viz': {
-    'start': True,
-    'image': 'gridappsd/viz:develop',
-    'pull': True,
-    'ports': {'8082/tcp': 8080},
-    'environment': '',
-    'links': '',
-    'volumes': '',
     'entrypoint': '',
   }
 }
@@ -112,7 +109,6 @@ for container in client.containers.list():
   container.stop()  
   time.sleep(5)
 
-data_dir = '/data/docker/gridappsd_testing'
 
 print ("\nRemoving previous data")
 path='{}/gridappsd'.format(data_dir)
@@ -169,7 +165,6 @@ for service, value in gridappsd_docker.items():
 time.sleep(30)
 
 # List all running containers
-print("\n")
 print ("\n\nList all containers")
 for container in client.containers.list():
   print (container.name)
