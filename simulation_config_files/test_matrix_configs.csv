@@ -1,0 +1,3 @@
+config file name,line name,duration,uses_houses,applications loaded,services configured
+t1-p1-config.json,123 bus,120,yes,None
+t2-p2-config.json,13 node skt,120,yes,None
