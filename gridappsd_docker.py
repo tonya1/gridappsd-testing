@@ -44,9 +44,7 @@ gridappsd_docker_config = {
         'ports': {'6379/tcp': 6379},
         'environment': [],
         'links': '',
-        'volumes': {
-            data_dir + '/gridappsd/redis/data': {'bind': '/data', 'mode': 'rw'}
-        },
+        'volumes': '',
         'entrypoint': 'redis-server --appendonly yes',
     },
     'blazegraph': {
@@ -70,7 +68,6 @@ gridappsd_docker_config = {
         },
         'links': '',
         'volumes': {
-            data_dir + '/gridappsd/mysql': {'bind': '/var/lib/mysql', 'mode': 'rw'},
             data_dir + '/dumps/gridappsd_mysql_dump.sql': {'bind': '/docker-entrypoint-initdb.d/schema.sql',
                                                            'mode': 'ro'}
         },
