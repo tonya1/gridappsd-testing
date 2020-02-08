@@ -8,6 +8,7 @@ Python script to start the gridappsd platform for automated testing
 # setup python environment
 sudo apt install python3.6 python3.6-venv
 python3.6 -m venv env
+source env/bin/activate
 pip3 install -r requirements.txt 
 
 # run pytest

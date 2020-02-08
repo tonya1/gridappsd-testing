@@ -156,11 +156,11 @@ def docker_up(docker_config=None):
             sources.write(re.sub(r'localhost', '%', line))
 
     # Pull the container
-    # print ("\n")
-    # for service, value in gridappsd_docker_config.items():
-    #  if gridappsd_docker_config[service]['pull']:
-    #    print ("Pulling %s : %s" % ( service, gridappsd_docker_config[service]['image']))
-    #    image = client.images.pull(gridappsd_docker_config[service]['image'])
+    print ("\n")
+    for service, value in gridappsd_docker_config.items():
+     if gridappsd_docker_config[service]['pull']:
+       print ("Pulling %s : %s" % ( service, gridappsd_docker_config[service]['image']))
+       client.images.pull(gridappsd_docker_config[service]['image'])
 
     # Start the container
     print("\n")

@@ -8,6 +8,8 @@ import sys
 import pytest
 
 from gridappsd import GridAPPSD
+# tm: added for run_simulation workaround
+from gridappsd.simulation import Simulation
 from gridappsd_docker import docker_up, docker_down
 
 
@@ -48,13 +50,13 @@ def test_start_gridappsd():
 
 @pytest.mark.parametrize("sim_config_file, sim_result_file", [
     ("t1-p1-config.json", "t1-p1.output")
-    , ("t2-p2-config.json", "t2-p1.output"),
+    #, ("t2-p2-config.json", "t2-p1.output"),
     # , ("t3-p1-config.json", "t3-p1.output"),
 ])
 def test_simulation_output(sim_config_file, sim_result_file):
 
     sim_config_file = os.path.join(os.path.dirname(__file__), f"simulation_config_files/{sim_config_file}")
-    sim_result_file = os.path.join(os.path.dirname(__file__), f"simulation_baseline_files/{sim_config_file}")
+    sim_result_file = os.path.join(os.path.dirname(__file__), f"simulation_baseline_files/{sim_result_file}")
     assert os.path.exists(sim_config_file), f"File {sim_config_file} must exist to run simulation test"
     # assert os.path.exists(sim_result_file), f"File {sim_result_file} must exist to run simulation test"
 
@@ -72,10 +74,16 @@ def test_simulation_output(sim_config_file, sim_result_file):
                     nonlocal sim_complete
                     sim_complete = True
                     print("Completed simulator")
+                
                 print("Running config")
-                sim = gapps.run_simulation(sim_config_file)
+                # tm: added to get the simulation to run.  Copied from run_simulation.py.  Need to figure out what Craig was trying to do with the run_simulation code.
+                with open(sim_config_file) as fp:
+                    run_config = json.load(fp)
+                sim = Simulation(gapps, run_config)
+                #sim = gapps.run_simulation(run_config)
 
-                sim.add_onmeasurement_callback(onmeasurement)
+                # tm: typo in add_onmesurement
+                sim.add_onmesurement_callback(onmeasurement)
                 sim.add_oncomplete_callback(onfinishsimulation)
                 print("Starting sim")
                 sim.start_simulation()
