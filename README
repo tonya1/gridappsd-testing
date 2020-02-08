@@ -1,17 +1,14 @@
 
 Python script to start the gridappsd platform for automated testing
 
-pip install docker
-
-On OSX to fix cert error:
-/Applications/Python\ 3.8//Install\ Certificates.command
-
-
-todo:
-  - try: dictionary items
-
-
 *** This will stop all your running containers ***
 
-to start the containers
-  python3 gridapspd_testing.py
+*** Requires python 3.6 ***
+
+# setup python environment
+sudo apt install python3.6 python3.6-venv
+python3.6 -m venv env
+pip3 install -r requirements.txt 
+
+# run pytest
+pytest -s
