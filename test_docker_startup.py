@@ -16,25 +16,30 @@ from gridappsd.simulation import Simulation
 from gridappsd_docker import docker_up, docker_down
 
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-
+LOGGER = logging.getLogger(__name__)
 
 @contextmanager
 def startup_containers(spec=None):
+    LOGGER.info('Starting gridappsd containers')
     docker_up(spec)
+    LOGGER.info('Containers started')
 
     yield
 
+    LOGGER.info('Stopping gridappsd containers')
     docker_down()
+    LOGGER.info('Containers stopped')
 
 
 @contextmanager
 def gappsd() -> GridAPPSD:
     gridappsd = GridAPPSD()
+    LOGGER.info('Gridappsd connected')
 
     yield gridappsd
 
     gridappsd.disconnect()
+    LOGGER.info('Gridappsd disconnected')
 
 
 # def assert_files_are_equal(file1, file2):
@@ -100,17 +105,22 @@ def test_simulation_output(sim_config_file, sim_result_file):
     # assert os.path.exists(sim_result_file), f"File {sim_result_file} must exist to run simulation test"
 
     with startup_containers():
+        # Allow proven to come up
+        sleep(30)
         with gappsd() as gapps:
             os.makedirs("/tmp/output", exist_ok=True)
             with open("/tmp/output/simulation.output", 'w') as outfile:
+                LOGGER.info('Configuring simulation')
                 sim_complete = False
                 rcvd_measurement = False
 
                 def onmeasurement(sim, timestep, measurements):
+                    LOGGER.info('Measurement received at %s', timestep)
                     nonlocal rcvd_measurement
                     #print(rcvd_measurement)
                     if not rcvd_measurement:
                         print(f"A measurement happened at {timestep}")
+
                         outfile.write(f"{timestep}|{json.dumps(measurements)}\n")
                         # data = {}
                         # data["data"] = measurements
@@ -139,12 +149,14 @@ def test_simulation_output(sim_config_file, sim_result_file):
                 def onfinishsimulation(sim):
                     nonlocal sim_complete
                     sim_complete = True
-                    print("Completed simulator")
+                    LOGGER.info('Simulation Complete')
                 
-                print("Running config")
+                LOGGER.info('Loading config')
                 starttime = int(time())
-                # tm: added to get the simulation to run.  Copied from run_simulation.py.  Need to figure out what Craig was trying to do with the run_simulation code.
+                # tm: added to get the simulation to run.  Copied from run_simulation.py.  
+                # tm: Need to figure out what Craig was trying to do with the run_simulation code.
                 with open(sim_config_file) as fp:
+                    LOGGER.info('Reading config')
                     run_config = json.load(fp)
                     run_config["simulation_config"]["start_time"] = str(starttime)
                     print(starttime)
@@ -153,13 +165,16 @@ def test_simulation_output(sim_config_file, sim_result_file):
                 #sim = gapps.run_simulation(run_config)
 
                 # tm: typo in add_onmesurement
+                LOGGER.info('sim.add_onmesurement_callback')
                 sim.add_onmesurement_callback(onmeasurement)
+                LOGGER.info('sim.add_oncomplete_callback')
                 sim.add_oncomplete_callback(onfinishsimulation)
-                print("Starting sim")
+                LOGGER.info('Starting sim')
                 sim.start_simulation()
 
 
                 while not sim_complete:
+                    LOGGER.info('Sleeping')
                     sleep(5)
 
             #assert dictsAlmostEqual(sim_result_file, "/tmp/output/simulation.output")
