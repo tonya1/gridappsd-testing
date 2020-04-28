@@ -1,0 +1,4 @@
+# enter requirements that aren't related to connecting to the messagebus here
+git+https://github.com/GRIDAPPSD/gridappsd-python.git@develop#egg=gridappsd
+pytest
+docker

@@ -1,0 +1,157 @@
+{
+    "data": {
+        "head": {
+            "vars": [
+                "feeder_name",
+                "subregion_name",
+                "region_name"
+            ]
+        },
+        "results": {
+            "bindings": [
+                {
+                    "feeder_name": {
+                        "type": "literal",
+                        "value": "acep_psil"
+                    },
+                    "region_name": {
+                        "type": "literal",
+                        "value": "Alaska"
+                    },
+                    "subregion_name": {
+                        "type": "literal",
+                        "value": "Fairbanks"
+                    }
+                },
+                {
+                    "feeder_name": {
+                        "type": "literal",
+                        "value": "j1"
+                    },
+                    "region_name": {
+                        "type": "literal",
+                        "value": "EPRI"
+                    },
+                    "subregion_name": {
+                        "type": "literal",
+                        "value": "DPV"
+                    }
+                },
+                {
+                    "feeder_name": {
+                        "type": "literal",
+                        "value": "ieee123"
+                    },
+                    "region_name": {
+                        "type": "literal",
+                        "value": "IEEE"
+                    },
+                    "subregion_name": {
+                        "type": "literal",
+                        "value": "Medium"
+                    }
+                },
+                {
+                    "feeder_name": {
+                        "type": "literal",
+                        "value": "ieee123pv"
+                    },
+                    "region_name": {
+                        "type": "literal",
+                        "value": "IEEE"
+                    },
+                    "subregion_name": {
+                        "type": "literal",
+                        "value": "Medium"
+                    }
+                },
+                {
+                    "feeder_name": {
+                        "type": "literal",
+                        "value": "ieee13nodeckt"
+                    },
+                    "region_name": {
+                        "type": "literal",
+                        "value": "IEEE"
+                    },
+                    "subregion_name": {
+                        "type": "literal",
+                        "value": "Small"
+                    }
+                },
+                {
+                    "feeder_name": {
+                        "type": "literal",
+                        "value": "ieee13nodecktassets"
+                    },
+                    "region_name": {
+                        "type": "literal",
+                        "value": "IEEE"
+                    },
+                    "subregion_name": {
+                        "type": "literal",
+                        "value": "Small"
+                    }
+                },
+                {
+                    "feeder_name": {
+                        "type": "literal",
+                        "value": "ieee8500"
+                    },
+                    "region_name": {
+                        "type": "literal",
+                        "value": "IEEE"
+                    },
+                    "subregion_name": {
+                        "type": "literal",
+                        "value": "Large"
+                    }
+                },
+                {
+                    "feeder_name": {
+                        "type": "literal",
+                        "value": "test9500new"
+                    },
+                    "region_name": {
+                        "type": "literal",
+                        "value": "IEEE"
+                    },
+                    "subregion_name": {
+                        "type": "literal",
+                        "value": "Large"
+                    }
+                },
+                {
+                    "feeder_name": {
+                        "type": "literal",
+                        "value": "sourceckt"
+                    },
+                    "region_name": {
+                        "type": "literal",
+                        "value": "PNNL"
+                    },
+                    "subregion_name": {
+                        "type": "literal",
+                        "value": "Taxonomy"
+                    }
+                },
+                {
+                    "feeder_name": {
+                        "type": "literal",
+                        "value": "ieee123transactive"
+                    },
+                    "region_name": {
+                        "type": "literal",
+                        "value": "IEEE"
+                    },
+                    "subregion_name": {
+                        "type": "literal",
+                        "value": "Medium"
+                    }
+                }
+            ]
+        }
+    },
+    "id": "2126488164",
+    "responseComplete": true
+}

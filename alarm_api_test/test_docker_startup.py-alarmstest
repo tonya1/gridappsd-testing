@@ -1,0 +1,117 @@
+from contextlib import contextmanager
+import json
+import logging
+import os
+from time import sleep,time
+import sys
+import pandas as pd
+import pytest
+from numbers import Number
+from math import isclose
+
+import yaml
+from gridappsd import GridAPPSD
+# tm: added for run_simulation workaround
+from gridappsd.simulation import Simulation
+from gridappsd_docker import docker_up, docker_down
+
+#sys.path.append("/home/singha42/repos/gridappsd_alarms")
+#from gridappsd_alarms import SimulationSubscriber
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+
+
+@contextmanager
+def startup_containers(spec=None):
+    docker_up(spec)
+
+    yield
+
+    docker_down()
+
+
+@contextmanager
+def gappsd() -> GridAPPSD:
+    gridappsd = GridAPPSD()
+
+    yield gridappsd
+
+    gridappsd.disconnect()
+
+
+
+def test_start_gridappsd():
+    with startup_containers():
+        g = GridAPPSD()
+        assert g.connected
+
+
+
+@pytest.mark.parametrize("sim_config_file, sim_result_file", [
+    ("9500-config.json", "9500-simulation.output")
+    #("123-config.json", "123-simulation.output"),
+    #("13-node-config.json", "13-node-sim.output"),
+    # , ("t3-p1-config.json", "t3-p1.output"),
+])
+def test_simulation_output(sim_config_file, sim_result_file):
+    simulation_id = None
+    sim_config_file = os.path.join(os.path.dirname(__file__), f"simulation_config_files/{sim_config_file}")
+    sim_result_file = os.path.join(os.path.dirname(__file__), f"simulation_baseline_files/{sim_result_file}")
+    # sim_test_config = os.path.join(os.path.dirname(__file__), f"simulation_baseline_files/{sim_test_file}")
+
+    assert os.path.exists(sim_config_file), f"File {sim_config_file} must exist to run simulation test"
+    # assert os.path.exists(sim_result_file), f"File {sim_result_file} must exist to run simulation test"
+
+    with startup_containers():
+        with gappsd() as gapps:
+            os.makedirs("/tmp/output", exist_ok=True)
+            with open("/tmp/output/simulation.output", 'w') as outfile:
+                sim_complete = False
+                rcvd_measurement = False
+
+                def onmeasurement(sim, timestep, measurements):
+                    nonlocal rcvd_measurement
+                    #print(rcvd_measurement)
+                    if not rcvd_measurement:
+                        print(f"A measurement happened at {timestep}")
+                        outfile.write(f"{timestep}|{json.dumps(measurements)}\n")
+                        # data = {}
+                        # data["data"] = measurements
+                        # outfile.write(json.dumps(data))
+                        #rcvd_measurement = True
+
+
+                def onfinishsimulation(sim):
+                    nonlocal sim_complete
+                    sim_complete = True
+                    print("Completed simulator")
+                
+                print("Running config")
+                #starttime = int(time())
+                # tm: added to get the simulation to run.  Copied from run_simulation.py.  Need to figure out what Craig was trying to do with the run_simulation code.
+                with open(sim_config_file) as fp:
+                    run_config = json.load(fp)
+                    #run_config["simulation_config"]["start_time"] = str(starttime)
+                    print(run_config["simulation_config"]["start_time"])
+
+                sim = Simulation(gapps, run_config)
+                alarms_topic = '/topic/goss.gridappsd.simulation.gridappsd-alarms.[simulation_id].output'
+                print(alarms_topic)
+                #alarms_subscriber = SimulationSubscriber(gapps, on_message)
+                #sim_id = sim.start_simulation[simulation_id]
+                #alarms = gapps.subscribe("{}{}".format(alarms_topic, (simulation_id)),1)
+                #alarms = gapps.subscribe(alarms_topic, 1)
+                #sim = gapps.run_simulation(run_config)
+
+                # tm: typo in add_onmesurement
+                sim.add_onmesurement_callback(onmeasurement)
+                sim.add_oncomplete_callback(onfinishsimulation)
+
+                print("Starting sim")
+                sim.start_simulation()
+                print(sim.simulation_id)
+
+
+                while not sim_complete:
+                    sleep(5)
+
+            #assert dictsAlmostEqual(sim_result_file, "/tmp/output/simulation.output")
