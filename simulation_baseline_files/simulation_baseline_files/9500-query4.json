@@ -1,0 +1,108 @@
+{
+    "data": {
+        "models": [
+            {
+                "modelId": "_77966920-E1EC-EE8A-23EE-4EFD23B205BD",
+                "modelName": "acep_psil",
+                "regionId": "_96465E7A-6EC3-ECCA-BC27-31B53F05C96E",
+                "regionName": "Alaska",
+                "stationId": "_22B12048-23DF-007B-9291-826A16DBCB21",
+                "stationName": "UAF",
+                "subRegionId": "_2F8FC9BF-FF32-A197-D541-0A2529D04DF7",
+                "subRegionName": "Fairbanks"
+            },
+            {
+                "modelId": "_C1C3E687-6FFD-C753-582B-632A27E28507",
+                "modelName": "ieee123",
+                "regionId": "_73C512BD-7249-4F50-50DA-D93849B89C43",
+                "regionName": "IEEE",
+                "stationId": "_FE44B314-385E-C2BF-3983-3A10C6060022",
+                "stationName": "IEEE123",
+                "subRegionId": "_1CD7D2EE-3C91-3248-5662-A43EFEFAC224",
+                "subRegionName": "Medium"
+            },
+            {
+                "modelId": "_E407CBB6-8C8D-9BC9-589C-AB83FBF0826D",
+                "modelName": "ieee123pv",
+                "regionId": "_73C512BD-7249-4F50-50DA-D93849B89C43",
+                "regionName": "IEEE",
+                "stationId": "_FE44B314-385E-C2BF-3983-3A10C6060022",
+                "stationName": "IEEE123",
+                "subRegionId": "_1CD7D2EE-3C91-3248-5662-A43EFEFAC224",
+                "subRegionName": "Medium"
+            },
+            {
+                "modelId": "_503D6E20-F499-4CC7-8051-971E23D0BF79",
+                "modelName": "ieee123transactive",
+                "regionId": "_24BA911D-65D5-4769-9A30-4178B2DFA203",
+                "regionName": "IEEE",
+                "stationId": "_A4C079AE-FE2B-4D11-969E-1268AFC562E9",
+                "stationName": "PNNL",
+                "subRegionId": "_2BBFD370-B30F-4EC5-B7AE-6873921C8C7C",
+                "subRegionName": "Medium"
+            },
+            {
+                "modelId": "_49AD8E07-3BF9-A4E2-CB8F-C3722F837B62",
+                "modelName": "ieee13nodeckt",
+                "regionId": "_73C512BD-7249-4F50-50DA-D93849B89C43",
+                "regionName": "IEEE",
+                "stationId": "_6C62C905-6FC7-653D-9F1E-1340F974A587",
+                "stationName": "IEEE13",
+                "subRegionId": "_ABEB635F-729D-24BF-B8A4-E2EF268D8B9E",
+                "subRegionName": "Small"
+            },
+            {
+                "modelId": "_5B816B93-7A5F-B64C-8460-47C17D6E4B0F",
+                "modelName": "ieee13nodecktassets",
+                "regionId": "_73C512BD-7249-4F50-50DA-D93849B89C43",
+                "regionName": "IEEE",
+                "stationId": "_6C62C905-6FC7-653D-9F1E-1340F974A587",
+                "stationName": "IEEE13",
+                "subRegionId": "_ABEB635F-729D-24BF-B8A4-E2EF268D8B9E",
+                "subRegionName": "Small"
+            },
+            {
+                "modelId": "_4F76A5F9-271D-9EB8-5E31-AA362D86F2C3",
+                "modelName": "ieee8500",
+                "regionId": "_73C512BD-7249-4F50-50DA-D93849B89C43",
+                "regionName": "IEEE",
+                "stationId": "_F1E8E479-5FA0-4BFF-8173-B375D25B0AA2",
+                "stationName": "IEEE8500",
+                "subRegionId": "_A1170111-942A-6ABD-D325-C64886DC4D7D",
+                "subRegionName": "Large"
+            },
+            {
+                "modelId": "_67AB291F-DCCD-31B7-B499-338206B9828F",
+                "modelName": "j1",
+                "regionId": "_9A1E61E4-5CF1-982B-C7EF-0918D26645C7",
+                "regionName": "EPRI",
+                "stationId": "_A3C31EE7-4EE6-A167-87C7-915B1C6E97F0",
+                "stationName": "J1",
+                "subRegionId": "_096FDFB8-2692-D811-F483-553D578399F2",
+                "subRegionName": "DPV"
+            },
+            {
+                "modelId": "_9CE150A8-8CC5-A0F9-B67E-BBD8C79D3095",
+                "modelName": "sourceckt",
+                "regionId": "_79C9D814-3CE0-DC11-534D-BDA1AF949810",
+                "regionName": "PNNL",
+                "stationId": "_933D85C1-BE1C-4C05-D4DD-4B41D941C52C",
+                "stationName": "sourceckt_Substation",
+                "subRegionId": "_656EE259-23FF-086E-1DC0-39CB9DC60A20",
+                "subRegionName": "Taxonomy"
+            },
+            {
+                "modelId": "_AAE94E4A-2465-6F5E-37B1-3E72183A4E44",
+                "modelName": "test9500new",
+                "regionId": "_73C512BD-7249-4F50-50DA-D93849B89C43",
+                "regionName": "IEEE",
+                "stationId": "_40485321-9B2C-1B8C-EC33-39D2F7948163",
+                "stationName": "ThreeSubs",
+                "subRegionId": "_A1170111-942A-6ABD-D325-C64886DC4D7D",
+                "subRegionName": "Large"
+            }
+        ]
+    },
+    "id": "1042047246",
+    "responseComplete": true
+}

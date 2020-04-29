@@ -1,4 +1,0 @@
-config file name,line name,duration,uses_houses,applications loaded,services configured
-#9500-config.json,9500 model,60,yes,None
-#123-config.json,123 bus,60,yes,None
-13-node-config.json,13 node ckt,120,yes,None
