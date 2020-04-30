@@ -51,15 +51,19 @@ def on_message(self, message):
         message_str = 'received message ' + str(message)
 
         json_msg = yaml.safe_load(str(message))
-
-        measurement_values = json_msg["message"]["measurements"]
-
-        for y in measurement_values:
-            m = measurement_values[y]
-            # if m.get("measurement_mrid") == "_302E3119-B3ED-46A1-87D5-EBC8496357DF":
-            print("Alarm created")
-            with open("/tmp/output/alarm-msg.output", 'w') as outfile:
-                outfile.write(json.dumps(json_msg))
+        print(json_msg)
+        print("Alarm created")
+        with open("/tmp/output/alarm.json", 'w') as f:
+            f.write(json.dumps(json_msg))
+        with open("/tmp/output/alarm.json", 'r') as fp:
+            alarm = json.load(fp)
+            print("Alka", fp)
+            for y in alarm:
+                m = alarm[y]
+                print(m)
+                print("Alkaaa")
+                if "created_by" in m.keys():
+                    print("Alarm present")
 
     except Exception as e:
         message_str = "An error occurred while trying to translate the  message received" + str(e)
@@ -110,7 +114,9 @@ def test_alarm_output(sim_config_file, sim_result_file):
                 LOGGER.info('Starting sim')
                 print(sim.simulation_id)
                 alarms_topic = t.service_output_topic('gridappsd-alarms', sim.simulation_id)
-                print(gapps.subscribe(alarms_topic, on_message))
+                print(alarms_topic)
+                gapps.subscribe(alarms_topic, on_message)
+
                 print("Alarm topic working")
                 #print(gapps.subscribe(alarms_topic, on_message))
                 sim.add_onmesurement_callback(onmeasurement)
@@ -123,4 +129,4 @@ def test_alarm_output(sim_config_file, sim_result_file):
 
                 while not sim_complete:
                     LOGGER.info('Sleeping')
-                    sleep(5)
+                    sleep(30)
