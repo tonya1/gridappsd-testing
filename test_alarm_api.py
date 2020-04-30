@@ -51,18 +51,13 @@ def on_message(self, message):
         message_str = 'received message ' + str(message)
 
         json_msg = yaml.safe_load(str(message))
-        print(json_msg)
-        print("Alarm created")
+
         with open("/tmp/output/alarm.json", 'w') as f:
             f.write(json.dumps(json_msg))
         with open("/tmp/output/alarm.json", 'r') as fp:
             alarm = json.load(fp)
-            print("Alka", fp)
             for y in alarm:
-                m = alarm[y]
-                print(m)
-                print("Alkaaa")
-                if "created_by" in m.keys():
+                if "created_by" in y:
                     print("Alarm present")
 
     except Exception as e:
