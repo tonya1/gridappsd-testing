@@ -8,12 +8,12 @@ python:
 services:
   - docker
 
-notifications:
-  email:
-    recipients: 
-      - secure: "bPUoN7yZTjDch9IXtAhbE4Vhe8zz486D1fhA7vm10lP4LInuTB2LCyUe6Ef8B3BitYwV0q8y6NCzHEOU2gBHTS+a0FW8yZV1Uhuytgdxr5NnM2OivjaQdDz4xw+NyC9aO963WeGBYYSfqHyTaFA5kwu1G0CZp2YpPi0UWrtRdpRz9dTfJ63Tt1tgeaopUU/xVm2rv+N98HC+SI5DUivsSmQQ4Uwdj+tfNh3tweNlmNs6E1UcTAUXCILzkc7ZWde2Q/oazbKg/6N4ZR5ahrJHDdo3qdtVxHqyUl4Ef7/MsDYkIJcqE4ThtuG5hlWZgYlZ7w35fevdF1/eyWQXOtMs+IAHLYrysjIpJqvoHWsE+yuZMRcurekQG2TK7/uty6YG03/jNnSWAATU+Q1WTZTIGxduFbtdmOFnIHyBfMH6Lu5fs6fOl/dmhDu6Q/qZocSJQNLpPksVQnM0Z41cS/xpmlOPYo/OvArnvdOqOvpNuQ4dFtsyt7aW//iVZ0/mddbFwdMjRyiNXWsB7JMzes4ckcYfKb3PukFL/WqfgNNhy51OqwmUdPBDl5bjzA+Mqfj+dDTfoZtlK830ESyfNV0Qk3JwAxxjtRpHlM3NzV1Ne1RBAfWA/p1sfMA7bSrwQAXCgkJn1/2gMBpHzut77RJWkcP1hwQIbWkHGrvaQEy5uBE="
-    on_success: never # default: change
-    on_failure: always # default: always
+#notifications:
+#  email:
+#    recipients: 
+#      - secure: "bPUoN7yZTjDch9IXtAhbE4Vhe8zz486D1fhA7vm10lP4LInuTB2LCyUe6Ef8B3BitYwV0q8y6NCzHEOU2gBHTS+a0FW8yZV1Uhuytgdxr5NnM2OivjaQdDz4xw+NyC9aO963WeGBYYSfqHyTaFA5kwu1G0CZp2YpPi0UWrtRdpRz9dTfJ63Tt1tgeaopUU/xVm2rv+N98HC+SI5DUivsSmQQ4Uwdj+tfNh3tweNlmNs6E1UcTAUXCILzkc7ZWde2Q/oazbKg/6N4ZR5ahrJHDdo3qdtVxHqyUl4Ef7/MsDYkIJcqE4ThtuG5hlWZgYlZ7w35fevdF1/eyWQXOtMs+IAHLYrysjIpJqvoHWsE+yuZMRcurekQG2TK7/uty6YG03/jNnSWAATU+Q1WTZTIGxduFbtdmOFnIHyBfMH6Lu5fs6fOl/dmhDu6Q/qZocSJQNLpPksVQnM0Z41cS/xpmlOPYo/OvArnvdOqOvpNuQ4dFtsyt7aW//iVZ0/mddbFwdMjRyiNXWsB7JMzes4ckcYfKb3PukFL/WqfgNNhy51OqwmUdPBDl5bjzA+Mqfj+dDTfoZtlK830ESyfNV0Qk3JwAxxjtRpHlM3NzV1Ne1RBAfWA/p1sfMA7bSrwQAXCgkJn1/2gMBpHzut77RJWkcP1hwQIbWkHGrvaQEy5uBE="
+#    on_success: never # default: change
+#    on_failure: always # default: always
 
 install:
   - pip3 install -r requirements.txt 
