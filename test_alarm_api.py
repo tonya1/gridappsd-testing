@@ -37,6 +37,12 @@ def gappsd() -> GridAPPSD:
     gridappsd.disconnect()
 
 
+# def test_start_gridappsd():
+#    with startup_containers():
+#        g = GridAPPSD()
+#        assert g.connected
+
+
 def on_message(self, message):
     """ This method handles incoming messages on the fncs_output_topic for the simulation_id.
     Parameters
@@ -57,8 +63,7 @@ def on_message(self, message):
         with open("/tmp/output/alarm.json", 'r') as fp:
             alarm = json.load(fp)
             for y in alarm:
-                if "created_by" in y:
-                    print("Alarm present")
+                assert "created_by" in y, "Alarm is not generated"
 
     except Exception as e:
         message_str = "An error occurred while trying to translate the  message received" + str(e)
@@ -98,7 +103,7 @@ def test_alarm_output(sim_config_file, sim_result_file):
                     sim_complete = True
                     print("Completed simulator")
 
-                #print("Running config")
+                # print("Running config")
                 with open(sim_config_file) as fp:
                     run_config = json.load(fp)
                     print(run_config["simulation_config"]["start_time"])
@@ -106,21 +111,20 @@ def test_alarm_output(sim_config_file, sim_result_file):
                 sim = Simulation(gapps, run_config)
 
                 sim.start_simulation()
-                LOGGER.info('Starting sim')
+                LOGGER.info('Starting the  simulation')
                 print(sim.simulation_id)
                 alarms_topic = t.service_output_topic('gridappsd-alarms', sim.simulation_id)
                 print(alarms_topic)
                 gapps.subscribe(alarms_topic, on_message)
 
-                print("Alarm topic working")
-                #print(gapps.subscribe(alarms_topic, on_message))
+                LOGGER.info("Alarm topic working")
+
                 sim.add_onmesurement_callback(onmeasurement)
                 sim.add_oncomplete_callback(onfinishsimulation)
                 LOGGER.info('sim.add_onmesurement_callback')
                 sim.add_onmesurement_callback(onmeasurement)
                 LOGGER.info('sim.add_oncomplete_callback')
                 sim.add_oncomplete_callback(onfinishsimulation)
-
 
                 while not sim_complete:
                     LOGGER.info('Sleeping')

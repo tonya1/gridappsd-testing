@@ -44,12 +44,6 @@ def gappsd() -> GridAPPSD:
     gridappsd.disconnect()
 
 
-#def test_start_gridappsd():
-#    with startup_containers():
-#        g = GridAPPSD()
-#        assert g.connected
-
-
 def model_files_are_equal(file1, file2):
     with open(file1, 'r') as f1:
         with open(file2, 'r') as f2:
@@ -66,9 +60,8 @@ def model_files_are_equal(file1, file2):
                 for k in dict2:
                     n = dict2[k]
                     if "modelNames" in m.keys():
-                        if m.get("modelNames") == n.get("modelNames"):
-                            print("both same")
-                            return False
+                        assert m.get("modelNames") == n.get("modelNames") , "Model names do not match"
+                        return False
             return True
 
 
