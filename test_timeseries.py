@@ -5,12 +5,7 @@ import logging
 import os
 from time import sleep, time
 import sys
-import pandas as pd
 import pytest
-from numbers import Number
-from math import isclose
-
-import yaml
 from gridappsd import GridAPPSD, topics as t
 # tm: added for run_simulation workaround
 from gridappsd.simulation import Simulation
@@ -30,8 +25,8 @@ def startup_containers(spec=None):
     yield
 
     LOGGER.info('Stopping gridappsd containers')
-    #docker_down()
-    #LOGGER.info('Containers stopped')
+    # docker_down()
+    # LOGGER.info('Containers stopped')
 
 
 @contextmanager
@@ -71,14 +66,14 @@ def test_timeseries_output(sim_config_file, sim_result_file):
                     nonlocal rcvd_measurement
                     # print(rcvd_measurement)
                     if not rcvd_measurement:
-                        print(f"A measurement happened at {timestep}")
+                        # print(f"A measurement happened at {timestep}")
                         LOGGER.info('Measurement received at %s', timestep)
                         outfile.write(f"{timestep}|{json.dumps(measurements)}\n")
 
-                starttime = int(time())
                 with open(sim_config_file) as fp:
                     run_config = json.load(fp)
-                    run_config["simulation_config"]["start_time"] = str(starttime)
+                    starttime = run_config["simulation_config"]["start_time"]
+                    # run_config["simulation_config"]["start_time"] = str(starttime)
                     print(run_config["simulation_config"]["start_time"])
 
                 def onfinishsimulation(sim):
@@ -90,26 +85,27 @@ def test_timeseries_output(sim_config_file, sim_result_file):
                 sim.add_oncomplete_callback(onfinishsimulation)
                 sim.add_onmesurement_callback(onmeasurement)
                 sim.start_simulation()
-                print("Starting sim")
+                LOGGER.info("Starting simulation")
                 print(sim.simulation_id)
 
                 with open("./simulation_config_files/weather_data.json", 'r') as g:
                     LOGGER.info('Querying weather data from timeseries')
-                    a = gapps.get_response(t.TIMESERIES, json.load(g), timeout=30)
-                    print(a)
-                    #assert "Diffuse" in a, "Weather data query does not expected output"
-                    LOGGER.info('Query failed')
-
-                with open("./simulation_config_files/timeseries_query.json", 'r') as f:
-                    query = json.load(f)
-                    query["queryFilter"]["simulation_id"] = sim.simulation_id
-                    print(query["queryFilter"]["simulation_id"])
-
-                    LOGGER.info('Querying simulation data from timeseries')
-                    q = gapps.get_response(t.TIMESERIES, query, timeout=30)
-                    print(q)
-                    assert "points" in q, "Time series query does not have expected output"
-                    LOGGER.info('Simulation Query failed')
-
+                    query1 = json.load(g)
+                    # print(query1)
+                    a = gapps.get_response(t.TIMESERIES, query1, timeout=60)
+                    LOGGER.info('Weather data received ')
+                    assert "Diffuse" in a["data"][0], "Weather data query does not have expected output"
+                    LOGGER.info('Weather data query has expected output')
                 while not sim_complete:
                     sleep(5)
+
+            with open("./simulation_config_files/timeseries_query.json", 'r') as f:
+                query2 = json.load(f)
+                query2["queryFilter"]["simulation_id"] = sim.simulation_id
+                LOGGER.info('Querying simulation data from timeseries')
+                q = gapps.get_response(t.TIMESERIES, query2, timeout=300)
+                LOGGER.info('Simulation data received for Timeseries API')
+                file = open("./output.txt", "w")
+                file.write(json.dumps(q))
+                assert "hasSimulationMessageType" in q["data"][0], "Simulation data query does not have expected output"
+                LOGGER.info('Simulation data query has expected output')
