@@ -91,11 +91,12 @@ def test_timeseries_output(sim_config_file, sim_result_file):
                 with open("./simulation_config_files/weather_data.json", 'r') as g:
                     LOGGER.info('Querying weather data from timeseries')
                     query1 = json.load(g)
-                    # print(query1)
+
                     a = gapps.get_response(t.TIMESERIES, query1, timeout=60)
                     LOGGER.info('Weather data received ')
                     assert "Diffuse" in a["data"][0], "Weather data query does not have expected output"
                     LOGGER.info('Weather data query has expected output')
+
                 while not sim_complete:
                     sleep(5)
 
@@ -105,7 +106,13 @@ def test_timeseries_output(sim_config_file, sim_result_file):
                 LOGGER.info('Querying simulation data from timeseries')
                 q = gapps.get_response(t.TIMESERIES, query2, timeout=300)
                 LOGGER.info('Simulation data received for Timeseries API')
-                file = open("./output.txt", "w")
-                file.write(json.dumps(q))
                 assert "hasSimulationMessageType" in q["data"][0], "Simulation data query does not have expected output"
                 LOGGER.info('Simulation data query has expected output')
+
+            with open("./simulation_config_files/sensor_query.json", 'r') as file:
+                sensor_query = json.load(file)
+                sensor_query["queryFilter"]["simulation_id"] = sim.simulation_id
+                LOGGER.info('Querying GridAPPS-D sensor simulator data from timeseries')
+                result = gapps.get_response(t.TIMESERIES, sensor_query, timeout=300)
+                assert "hasSimulationMessageType" in result["data"][0], "Sensor simulator data does not have expected output"
+                LOGGER.info('Query response received for  GridAPPS-D sensor simulator data from timeseries')
