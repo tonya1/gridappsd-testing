@@ -1,0 +1,9 @@
+{   "queryMeasurement":"gridappsd-sensor-simulator",
+	"queryFilter":{
+		"simulation_id":"582881157",
+		"starttime":1373814002,
+        "endtime":1373814003
+   
+},
+   "responseFormat":"JSON"
+}
