@@ -21,20 +21,26 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 @contextmanager
 def startup_containers(spec=None):
+    LOGGER.info('Starting gridappsd containers')
     docker_up(spec)
+    LOGGER.info('Containers started')
 
     yield
 
+    LOGGER.info('Stopping gridappsd containers')
     docker_down()
+    LOGGER.info('Containers stopped')
 
 
 @contextmanager
 def gappsd() -> GridAPPSD:
     gridappsd = GridAPPSD()
+    LOGGER.info('Gridappsd connected')
 
     yield gridappsd
 
     gridappsd.disconnect()
+    LOGGER.info('Gridappsd disconnected')
 
 
 # def test_start_gridappsd():
@@ -63,6 +69,7 @@ def on_message(self, message):
         with open("/tmp/output/alarm.json", 'r') as fp:
             alarm = json.load(fp)
             for y in alarm:
+                print(y)
                 assert "created_by" in y, "Alarm is not generated"
 
     except Exception as e:
@@ -95,7 +102,8 @@ def test_alarm_output(sim_config_file, sim_result_file):
                     nonlocal rcvd_measurement
                     # print(rcvd_measurement)
                     if not rcvd_measurement:
-                        LOGGER.info('A measurement happened at {timestep}"')
+
+                        LOGGER.info('A measurement happened at %s', timestep)
                         rcvd_measurement = True
 
                 def onfinishsimulation(sim):
@@ -117,7 +125,7 @@ def test_alarm_output(sim_config_file, sim_result_file):
                 print(alarms_topic)
                 gapps.subscribe(alarms_topic, on_message)
 
-                LOGGER.info("Alarm topic working")
+                LOGGER.info("Querying Alarm topic for alarms")
 
                 sim.add_onmesurement_callback(onmeasurement)
                 sim.add_oncomplete_callback(onfinishsimulation)

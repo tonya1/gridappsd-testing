@@ -14,8 +14,8 @@ from gridappsd import GridAPPSD
 from gridappsd.simulation import Simulation
 from gridappsd_docker import docker_up, docker_down
 
-
 LOGGER = logging.getLogger(__name__)
+
 
 @contextmanager
 def startup_containers(spec=None):
@@ -89,65 +89,60 @@ def test_simulation_output(sim_config_file, sim_result_file):
     with startup_containers():
         # Allow proven to come up
         sleep(30)
+        starttime = int(time())
         with gappsd() as gapps:
             os.makedirs("/tmp/output", exist_ok=True)
             with open("/tmp/output/simulation.output", 'w') as outfile:
                 LOGGER.info('Configuring simulation')
                 sim_complete = False
                 rcvd_measurement = False
+                rcvd_first_measurement = 0
 
                 def onmeasurement(sim, timestep, measurements):
                     LOGGER.info('Measurement received at %s', timestep)
                     nonlocal rcvd_measurement
-                    # print(rcvd_measurement)
+                    nonlocal rcvd_first_measurement
+
+                    if rcvd_first_measurement == 0:
+
+                        rcvd_first_measurement = timestep
+
+                    elif rcvd_first_measurement + 9 == timestep:
+                        LOGGER.info('Pausing simulation')
+                        sim.pause()
+                        LOGGER.info('Paused simulation')
+
+                    elif rcvd_first_measurement + 15 == timestep:
+                        LOGGER.info('Resuming simulation')
+                        sim.resume()
+                        LOGGER.info('Resumed simulation')
+
                     if not rcvd_measurement:
                         print(f"A measurement happened at {timestep}")
-                        #outfile.write(f"{timestep}|{json.dumps(measurements)}\n")
+                        # outfile.write(f"{timestep}|{json.dumps(measurements)}\n")
                         data = {}
                         data["data"] = measurements
                         outfile.write(json.dumps(data))
                         rcvd_measurement = True
 
-
-                    print("Time is", int(time()))
-                    print("Start time is ", starttime)
-
-                    if int(time()) > starttime + 10:
-                        sim.pause()
-                        # print(sim.simulation_id)
-                        LOGGER.info('Pausing simulation')
-
-                    # if int(time()) > starttime + 15:
-                    if timestep > starttime + 15:
-                        sim.resume_pause_at(starttime + 20)
-                        # print(sim.simulation_id)
-                        LOGGER.info('Resuming simulation')
-
-                    # if timestep == 1580420729:
-                    #     sim.resume()
-                    #     outfile.write("resuming")
-
                 def onfinishsimulation(sim):
                     nonlocal sim_complete
                     sim_complete = True
                     LOGGER.info('Simulation Complete')
-                
+
+                LOGGER.info(f"Start time is {starttime}")
                 LOGGER.info('Loading config')
-                starttime = int(time())
-                # tm: added to get the simulation to run.  Copied from run_simulation.py.  
-                # tm: Need to figure out what Craig was trying to do with the run_simulation code.
                 with open(sim_config_file) as fp:
                     LOGGER.info('Reading config')
                     run_config = json.load(fp)
                     run_config["simulation_config"]["start_time"] = str(starttime)
-                    print(starttime)
 
                 sim = Simulation(gapps, run_config)
-                # sim = gapps.run_simulation(run_config)
 
                 # tm: typo in add_onmesurement
                 LOGGER.info('sim.add_onmesurement_callback')
                 sim.add_onmesurement_callback(onmeasurement)
+                # sim.add_ontimestep_callback()
                 LOGGER.info('sim.add_oncomplete_callback')
                 sim.add_oncomplete_callback(onfinishsimulation)
                 LOGGER.info('Starting sim')
