@@ -20,7 +20,8 @@ jobs:
     name: "Integration Tests"
     script: 
       - pytest -rA --log-level $LOGLEVEL
-#test_docker_startup.py::test_simulation_output
+#test_docker_startup.py::test_simulation_output 
+
 
 stages:
   - test
