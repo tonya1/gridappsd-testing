@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 import json
 import logging
+import yaml
 import os
 from time import sleep, time
 import sys
@@ -13,6 +14,7 @@ from gridappsd import GridAPPSD
 # tm: added for run_simulation workaround
 from gridappsd.simulation import Simulation
 from gridappsd_docker import docker_up, docker_down
+from gridappsd import topics as t
 
 LOGGER = logging.getLogger(__name__)
 
@@ -41,10 +43,23 @@ def gappsd() -> GridAPPSD:
     LOGGER.info('Gridappsd disconnected')
 
 
+def on_message(self, message):
+    # message = {}
+    try:
+        message_str = 'received message ' + str(message)
+
+        json_msg = yaml.safe_load(str(message))
+        # print(json_msg)
+        assert "pause" in json_msg['logMessage'], "Pause command not called"
+        LOGGER.info('Pause command sent to topic')
+        assert "resume" in json_msg['logMessage'], "Resume command not called"
+        LOGGER.info('Resume command received')
+
+    except Exception as e:
+        message_str = "An error occurred while trying to translate the  message received" + str(e)
+
+
 def dictsAlmostEqual(file1, file2, rel_tol=1e-3):
-    # file1 = "/home/singha42/repos/gridappsd-testing/simulation_baseline_files/123-simulation.output"
-    #
-    # file2 = "/tmp/output/simulation.output"
     with open(file1, 'r') as f1:
         with open(file2, 'r') as f2:
             # dict1 = [json.loads(line) for line in f1]
@@ -104,15 +119,14 @@ def test_simulation_output(sim_config_file, sim_result_file):
                     nonlocal rcvd_first_measurement
 
                     if rcvd_first_measurement == 0:
-
                         rcvd_first_measurement = timestep
 
-                    elif rcvd_first_measurement + 9 == timestep:
+                    elif rcvd_first_measurement + 99 == timestep:
                         LOGGER.info('Pausing simulation')
                         sim.pause()
                         LOGGER.info('Paused simulation')
 
-                    elif rcvd_first_measurement + 15 == timestep:
+                    elif rcvd_first_measurement + 114 == timestep:
                         LOGGER.info('Resuming simulation')
                         sim.resume()
                         LOGGER.info('Resumed simulation')
@@ -120,10 +134,12 @@ def test_simulation_output(sim_config_file, sim_result_file):
                     if not rcvd_measurement:
                         print(f"A measurement happened at {timestep}")
                         # outfile.write(f"{timestep}|{json.dumps(measurements)}\n")
-                        data = {}
-                        data["data"] = measurements
+                        data = {"data": measurements}
                         outfile.write(json.dumps(data))
                         rcvd_measurement = True
+
+                def ontimestep(sim, timestep):
+                    print("Timestamp: {}".format(timestep))
 
                 def onfinishsimulation(sim):
                     nonlocal sim_complete
@@ -142,12 +158,15 @@ def test_simulation_output(sim_config_file, sim_result_file):
                 # tm: typo in add_onmesurement
                 LOGGER.info('sim.add_onmesurement_callback')
                 sim.add_onmesurement_callback(onmeasurement)
+                sim.add_ontimestep_callback(ontimestep)
+
                 # sim.add_ontimestep_callback()
                 LOGGER.info('sim.add_oncomplete_callback')
                 sim.add_oncomplete_callback(onfinishsimulation)
                 LOGGER.info('Starting sim')
                 sim.start_simulation()
-
+                print(sim.simulation_id)
+                gapps.subscribe(t.simulation_log_topic(sim.simulation_id), on_message)
                 while not sim_complete:
                     LOGGER.info('Sleeping')
                     sleep(5)
