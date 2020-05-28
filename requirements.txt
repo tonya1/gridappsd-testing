@@ -2,4 +2,3 @@
 git+https://github.com/GRIDAPPSD/gridappsd-python.git@develop#egg=gridappsd
 pytest
 docker
-pandas
