@@ -1,68 +1,57 @@
-import ast
 from contextlib import contextmanager
 import json
 import logging
 import os
-from time import sleep, time
-import sys
-import pandas as pd
+from time import sleep
 import pytest
-from numbers import Number
-from math import isclose
 
-import yaml
 from gridappsd import GridAPPSD,topics as t
-# tm: added for run_simulation workaround
 from gridappsd.simulation import Simulation
 from gridappsd_docker import docker_up, docker_down
-
-# sys.path.append("/home/singha42/repos/gridappsd_alarms")
 # from gridappsd_alarms import SimulationSubscriber
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+LOGGER = logging.getLogger(__name__)
 
 POWERGRID_MODEL = 'powergridmodel'
-
 database_type = POWERGRID_MODEL
-
 request_topic = '.'.join((t.REQUEST_DATA, database_type))
 
 @contextmanager
 def startup_containers(spec=None):
+    LOGGER.info('Starting gridappsd containers')
     docker_up(spec)
+    LOGGER.info('Containers started')
 
     yield
 
+    LOGGER.info('Stopping gridappsd containers')
     docker_down()
+    LOGGER.info('Containers stopped')
 
 
 @contextmanager
 def gappsd() -> GridAPPSD:
     gridappsd = GridAPPSD()
+    LOGGER.info('Gridappsd connected')
 
     yield gridappsd
 
     gridappsd.disconnect()
-
+    LOGGER.info('Gridappsd disconnected')
 
 def model_files_are_equal(file1, file2):
     with open(file1, 'r') as f1:
         with open(file2, 'r') as f2:
 
             dict1 = json.load(f1)
-            # print(dict1)
             dict2 = json.load(f2)
 
-            # print(dict2)
             if len(dict1) != len(dict2):
                 return False
-            for y in dict1:
-                m = dict1[y]
-                for k in dict2:
-                    n = dict2[k]
-                    if "modelNames" in m.keys():
-                        assert m.get("modelNames") == n.get("modelNames") , "Model names do not match"
-                        return False
-            return True
+
+            if dict1['data']['modelNames'] != dict2['data']['modelNames']:
+                return False
+
+    return True
 
 
 def object_files_are_equal(file1, file2):
@@ -71,21 +60,15 @@ def object_files_are_equal(file1, file2):
         with open(file2, 'r') as f2:
 
             dict1 = json.load(f1)
-            # print(dict1)
             dict2 = json.load(f2)
 
-            # print(dict2)
             if len(dict1) != len(dict2):
                 return False
-            for y in dict1:
-                m = dict1[y]
-                for k in dict2:
-                    n = dict2[k]
-                    if "results" in m.keys():
-                        if m.get("bindings") == n.get("bindings"):
-                            print(" objects both same")
-                            return False
-            return True
+
+            if dict1['data']['results']['bindings'] != dict2['data']['results']['bindings']:
+                return False
+
+    return True
 
 
 def object_types_are_equal(file1, file2):
@@ -94,21 +77,15 @@ def object_types_are_equal(file1, file2):
         with open(file2, 'r') as f2:
 
             dict1 = json.load(f1)
-            # print(dict1)
             dict2 = json.load(f2)
 
-            # print(dict2)
             if len(dict1) != len(dict2):
                 return False
-            for y in dict1:
-                m = dict1[y]
-                for k in dict2:
-                    n = dict2[k]
-                    if "objectTypes" in m.keys():
-                        if m.get("objectTypes") == n.get("objectTypes"):
-                            print("both objects types are  same")
-                            return False
-            return True
+
+            if dict1['data']['objectTypes'] != dict2['data']['objectTypes']:
+                return False
+
+    return True
 
 
 def models_are_equal(file1, file2):
@@ -117,21 +94,15 @@ def models_are_equal(file1, file2):
         with open(file2, 'r') as f2:
 
             dict1 = json.load(f1)
-            # print(dict1)
             dict2 = json.load(f2)
 
-            # print(dict2)
             if len(dict1) != len(dict2):
                 return False
-            for y in dict1:
-                m = dict1[y]
-                for k in dict2:
-                    n = dict2[k]
-                    if "models" in m.keys():
-                        if m.get("models") == n.get("models"):
-                            print("Models data is  same")
-                            return False
-            return True
+
+            if dict1['data']['models'] != dict2['data']['models']:
+                return False
+
+    return True
 
 
 def query_data_equal(file1, file2):
@@ -140,102 +111,57 @@ def query_data_equal(file1, file2):
         with open(file2, 'r') as f2:
 
             dict1 = json.load(f1)
-            # print(dict1)
             dict2 = json.load(f2)
 
-            # print(dict2)
             if len(dict1) != len(dict2):
                 return False
-            for y in dict1:
-                m = dict1[y]
-                for k in dict2:
-                    n = dict2[k]
-                    if "results" in m.keys():
-                        if m.get("bindings") == n.get("bindings"):
-                            print("Query data are  same")
-                            return False
-            return True
+
+            if dict1['data']['results']['bindings'] != dict2['data']['results']['bindings']:
+                return False
+
+    return True
 
 
-@pytest.mark.parametrize("sim_config_file, sim_result_file", [
-    ("9500-config.json", "9500-simulation.json")
-    # ("123-config.json", "123-simulation.json"),
-    # ("13-node-config.json", "13-node-sim.json"),
-    # , ("t3-p1-config.json", "t3-p1.json"),
-])
-def test_power_output(sim_config_file, sim_result_file):
-    simulation_id = None
-    sim_config_file = os.path.join(os.path.dirname(__file__), f"simulation_config_files/{sim_config_file}")
-    sim_result_file = os.path.join(os.path.dirname(__file__), f"simulation_baseline_files/{sim_result_file}")
-    # sim_test_config = os.path.join(os.path.dirname(__file__), f"simulation_baseline_files/{sim_test_file}")
-
-    assert os.path.exists(sim_config_file), f"File {sim_config_file} must exist to run simulation test"
-    # assert os.path.exists(sim_result_file), f"File {sim_result_file} must exist to run simulation test"
-
+def test_power_model_names():
     with startup_containers():
         with gappsd() as gapps:
-            sleep(30)
-            os.makedirs("/tmp/output", exist_ok=True)
-            with open("/tmp/output/simulation.json", 'w') as outfile:
-                sim_complete = False
-                rcvd_measurement = False
+            LOGGER.info('Performing model name query')
+            with open("/tmp/output/power.json", 'w') as f:
+                r = gapps.query_model_names(model_id=None)
+                f.write(json.dumps(r, indent=4, sort_keys=True))
 
-                def onmeasurement(sim, timestep, measurements):
-                    nonlocal rcvd_measurement
-                    # print(rcvd_measurement)
-                    if not rcvd_measurement:
-                        print(f"A measurement happened at {timestep}")
-                        outfile.write(f"{timestep}|{json.dumps(measurements)}\n")
+            LOGGER.info('Performing object query')
+            with open("/tmp/output/power2.json", 'w') as f:
+                obj = '_0f6f3735-b297-46aa-8861-547d3cd0dee9'
+                r2 = gapps.query_object(obj, model_id=None)
+                f.write(json.dumps(r2, indent=4, sort_keys=True))
 
-                with open(sim_config_file) as fp:
-                    run_config = json.load(fp)
+            LOGGER.info('Performing object type query')
+            with open("/tmp/output/power3.json", 'w') as f:
+                r3 = gapps.query_object_types(model_id=None)
+                f.write(json.dumps(r3, indent=4, sort_keys=True))
 
-                def onfinishsimulation(sim):
-                    nonlocal sim_complete
-                    sim_complete = True
-                    print("Completed simulator")
+            LOGGER.info('Performing model info query')
+            with open("/tmp/output/power4.json", 'w') as f:
+                r4 = gapps.query_model_info()
+                f.write(json.dumps(r4, indent=4, sort_keys=True))
 
-                starttime = int(time())
-                # tm: added to get the simulation to run.  Copied from run_simulation.py.  Need to figure out what Craig was trying to do with the run_simulation code.
-                with open(sim_config_file) as fp:
-                    run_config = json.load(fp)
-                    run_config["simulation_config"]["start_time"] = str(starttime)
-                    print(starttime)
+            LOGGER.info('Performing model data query')
+            with open("/tmp/output/power5.json", 'w') as f:
+                query = "select ?feeder_name ?subregion_name ?region_name WHERE {?line r:type c:Feeder.?line c:IdentifiedObject.name  ?feeder_name.?line c:Feeder.NormalEnergizingSubstation ?substation.?substation r:type c:Substation.?substation c:Substation.Region ?subregion.?subregion  c:IdentifiedObject.name  ?subregion_name .?subregion c:SubGeographicalRegion.Region  ?region . ?region   c:IdentifiedObject.name  ?region_name}"
+                r5 = gapps.query_data(query, database_type=POWERGRID_MODEL, timeout=30)
+                f.write(json.dumps(r5, indent=4, sort_keys=True))
+    assert model_files_are_equal('/tmp/output/power.json', './simulation_baseline_files/power_api_models.json'), 'Powergrid API model name differs'
 
-                sim = Simulation(gapps, run_config)
-                sim.add_oncomplete_callback(onfinishsimulation)
-                sim.add_onmesurement_callback(onmeasurement)
-                print("Starting sim")
-                print(sim.simulation_id)
 
-                with open("/tmp/output/power.json", 'w') as f:
-                    r = gapps.query_model_names(model_id=None)
-                    f.write(json.dumps(r, indent=4, sort_keys=True))
+def test_power_object():
+    assert object_files_are_equal('/tmp/output/power2.json', './simulation_baseline_files/9500-query2.json'), 'Powergrid API objects differ'
 
-                with open("/tmp/output/power2.json", 'w') as f:
-                    obj = '_0f6f3735-b297-46aa-8861-547d3cd0dee9'
-                    r2 = gapps.query_object(obj, model_id=None)
-                    f.write(json.dumps(r2, indent=4, sort_keys=True))
+def test_power_object_type():
+    assert object_types_are_equal('/tmp/output/power3.json', './simulation_baseline_files/9500-query3.json'), 'Powergrid API object types differ'
 
-                with open("/tmp/output/power3.json", 'w') as f:
-                    r3 = gapps.query_object_types(model_id=None)
-                    f.write(json.dumps(r3, indent=4, sort_keys=True))
+def test_power_query_model_info():
+    assert models_are_equal('/tmp/output/power4.json', './simulation_baseline_files/9500-query4.json'), 'Powergrid API query model info differs'
 
-                with open("/tmp/output/power4.json", 'w') as f:
-                    r4 = gapps.query_model_info()
-                    f.write(json.dumps(r4, indent=4, sort_keys=True))
-
-                with open("/tmp/output/power5.json", 'w') as f:
-                    query = "select ?feeder_name ?subregion_name ?region_name WHERE {?line r:type c:Feeder.?line c:IdentifiedObject.name  ?feeder_name.?line c:Feeder.NormalEnergizingSubstation ?substation.?substation r:type c:Substation.?substation c:Substation.Region ?subregion.?subregion  c:IdentifiedObject.name  ?subregion_name .?subregion c:SubGeographicalRegion.Region  ?region . ?region   c:IdentifiedObject.name  ?region_name}"
-                    r5 = gapps.query_data(query, database_type=POWERGRID_MODEL, timeout=30)
-                    f.write(json.dumps(r5, indent=4, sort_keys=True))
-
-                sim.start_simulation()
-                while not sim_complete:
-                    sleep(5)
-
-            model_files_are_equal(sim_result_file, '/tmp/output/power.json')
-            object_files_are_equal('/tmp/output/power2.json', './simulation_baseline_files/9500-query2.json')
-            object_types_are_equal('/tmp/output/power3.json', './simulation_baseline_files/9500-query3.json')
-            models_are_equal('/tmp/output/power4.json', './simulation_baseline_files/9500-query4.json')
-            query_data_equal('/tmp/output/power5.json', './simulation_baseline_files/9500-query5.json')
+def test_power_query_data():
+    assert query_data_equal('/tmp/output/power5.json', './simulation_baseline_files/9500-query5.json'), 'Powergrid API quer data differs'
