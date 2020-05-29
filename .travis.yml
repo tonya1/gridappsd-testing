@@ -5,6 +5,12 @@ language: python
 python:
   - 3.6.10
 
+addons:
+  artifacts:
+    s3_region: "us-west-2"
+    target_paths:
+      - /$TRAVIS_REPO_SLUG/
+
 services:
   - docker
 
@@ -16,7 +22,7 @@ jobs:
   - stage: test
     name: "Integration Tests"
     script: 
-      - pytest -rA
+      - pytest -rA --html=$(date +"%Y%m%d_%H%M%S")_${TRAVIS_BRANCH}_${TRAVIS_COMMIT}.html --self-contained-html
 
 stages:
   - test
