@@ -25,7 +25,7 @@ jobs:
     name: "Integration Tests"
     script: 
       - mkdir out
-      - pytest -rA --html=out/gridappsd_testing_$(date +"%Y%m%d_%H%M%S")_${TRAVIS_BRANCH}.html --self-contained-html
+      - pytest -rA --html=out/gridappsd-testing_$(date +"%Y%m%d_%H%M%S")_${TRAVIS_BRANCH}.html --self-contained-html
 
 stages:
   - test
