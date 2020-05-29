@@ -50,10 +50,15 @@ def on_message(self, message):
 
         json_msg = yaml.safe_load(str(message))
         # print(json_msg)
+
+        with open("./platform.txt", 'a') as fp:
+            fp.write(json.dumps(json_msg))
+
         assert "pause" in json_msg['logMessage'], "Pause command not called"
         LOGGER.info('Pause command sent to topic')
         assert "resume" in json_msg['logMessage'], "Resume command not called"
         LOGGER.info('Resume command received')
+
 
     except Exception as e:
         message_str = "An error occurred while trying to translate the  message received" + str(e)

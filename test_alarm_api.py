@@ -50,20 +50,11 @@ def gappsd() -> GridAPPSD:
 
 
 def on_message(self, message):
-    """ This method handles incoming messages on the fncs_output_topic for the simulation_id.
-    Parameters
-    ----------
-    headers: dict
-        A dictionary of headers that could be used to determine topic of origin and
-        other attributes.
-    message: object
-    """
-    # message ={}
     try:
         message_str = 'received message ' + str(message)
 
         json_msg = yaml.safe_load(str(message))
-
+        print(json_msg)
         with open("/tmp/output/alarm.json", 'w') as f:
             f.write(json.dumps(json_msg))
         with open("/tmp/output/alarm.json", 'r') as fp:
@@ -72,6 +63,26 @@ def on_message(self, message):
                 print(y)
                 assert "created_by" in y, "Alarm is not generated"
 
+    except Exception as e:
+        message_str = "An error occurred while trying to translate the  message received" + str(e)
+
+
+def on_message1(self, message1):
+    try:
+        message_str = 'received message ' + str(message1)
+
+        json_msg1 = yaml.safe_load(str(message1))
+        #print(json_msg1)
+        measurement_values = json_msg1["message"]["measurements"]
+
+        for x in measurement_values:
+            m = measurement_values[x]
+            # print(json_msg)
+            if m.get("measurement_mrid") == "_0f8202ca-a4bf-4c7e-9302-601919c09992":
+                print("Test1")
+                if m.get("value") == 10:
+                    print("json_msg")
+                    #print(m.get("value"))
     except Exception as e:
         message_str = "An error occurred while trying to translate the  message received" + str(e)
 
@@ -102,7 +113,6 @@ def test_alarm_output(sim_config_file, sim_result_file):
                     nonlocal rcvd_measurement
                     # print(rcvd_measurement)
                     if not rcvd_measurement:
-
                         LOGGER.info('A measurement happened at %s', timestep)
                         rcvd_measurement = True
 
@@ -121,18 +131,19 @@ def test_alarm_output(sim_config_file, sim_result_file):
                 sim.start_simulation()
                 LOGGER.info('Starting the  simulation')
                 print(sim.simulation_id)
+                LOGGER.info("Querying Alarm topic for alarms")
                 alarms_topic = t.service_output_topic('gridappsd-alarms', sim.simulation_id)
                 print(alarms_topic)
-                gapps.subscribe(alarms_topic, on_message)
-
-                LOGGER.info("Querying Alarm topic for alarms")
-
                 sim.add_onmesurement_callback(onmeasurement)
                 sim.add_oncomplete_callback(onfinishsimulation)
                 LOGGER.info('sim.add_onmesurement_callback')
                 sim.add_onmesurement_callback(onmeasurement)
                 LOGGER.info('sim.add_oncomplete_callback')
                 sim.add_oncomplete_callback(onfinishsimulation)
+                log_topic = t.simulation_output_topic(sim.simulation_id)
+                gapps.subscribe(alarms_topic, on_message)
+                gapps.subscribe(log_topic, on_message1)
+                print(log_topic)
 
                 while not sim_complete:
                     LOGGER.info('Sleeping')
