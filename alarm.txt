@@ -1,0 +1,1 @@
+[{'equipment_mrid': '_302E3119-B3ED-46A1-87D5-EBC8496357DF', 'value': 'Open', 'created_by': 'testmanager1', 'equipment_name': 'ln0895780_sw', 'phases': 'ABC'}]
