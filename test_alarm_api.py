@@ -50,32 +50,26 @@ def gappsd() -> GridAPPSD:
 
 
 def on_message(headers, message):
-    try:
-        message_str = 'received message ' + str(message)
-        json_msg = yaml.safe_load(str(message))
+
+    if "gridappsd-alarms" in headers["destination"]:
+
+        if "_302E3119-B3ED-46A1-87D5-EBC8496357DF" or "_A0E0AB93-FFC2-471B-B84C-19015CB15ED2" or "_2FA4B41B-C31B-4861-B8BB-941A8DFD1B41" in \
+                message['equipment_mrid']:
+            for y in message:
+                print(y)
+                if "Open" in y['value']:
+                    LOGGER.info('Alarms created')
+
+    if "gridappsd-alarms" not in headers["destination"]:
         #print(headers)
-        if "gridappsd-alarms" in headers["destination"]:
-            print(json_msg)
-            with open("/tmp/output/alarm.json", 'w') as f:
-                f.write(json.dumps(json_msg))
-            with open("/tmp/output/alarm.json", 'r') as fp:
-                alarm = json.load(fp)
-                for y in alarm:
-                    if "_302E3119-B3ED-46A1-87D5-EBC8496357DF" or "_A0E0AB93-FFC2-471B-B84C-19015CB15ED2" or "_2FA4B41B-C31B-4861-B8BB-941A8DFD1B41" in json_msg['equipment_mrid']:
-                        if "Open" in y['value']:
-                            LOGGER.info('Alarms created')
-
-        if "output" in headers["destination"]:
-            measurement_values = json_msg["message"]["measurements"]
-            for x in measurement_values:
-                m = measurement_values[x]
-                if m.get("measurement_id") == "_0f8202ca-a4bf-4c7e-9302-601919c09992":
-                    print("Present")
-                    if m.get("value") == "10":
-                        LOGGER.info('Value changed from 5 to 10')
-
-    except Exception as e:
-        message_str = "An error occurred while trying to translate the  message received" + str(e)
+        measurement_values = message["message"]["measurements"]
+        for x in measurement_values:
+            # print(measurement_values)
+            m = measurement_values[x]
+            if m.get("measurement_mrid") == "_0f8202ca-a4bf-4c7e-9302-601919c09992":
+                if m.get("value") == 10:
+                    #print(m.get("value"))
+                    LOGGER.info('Tap Changer Value changed from 5 to 10')
 
 
 @pytest.mark.parametrize("sim_config_file, sim_result_file", [
@@ -98,8 +92,10 @@ def test_alarm_output(sim_config_file, sim_result_file):
 
                 def onmeasurement(sim, timestep, measurements):
                     nonlocal rcvd_measurement
-                    LOGGER.info('A measurement happened at %s', timestep)
+                    #if not rcvd_measurement:
                     rcvd_measurement = True
+                    LOGGER.info('A measurement happened at %s', timestep)
+
 
                 def onfinishsimulation(sim):
                     nonlocal sim_complete
@@ -116,15 +112,15 @@ def test_alarm_output(sim_config_file, sim_result_file):
                 LOGGER.info('Starting the  simulation')
                 print(sim.simulation_id)
                 alarms_topic = t.service_output_topic('gridappsd-alarms', sim.simulation_id)
+                log_topic = t.simulation_output_topic(sim.simulation_id)
                 print(alarms_topic)
+                print(log_topic)
                 sim.add_onmesurement_callback(onmeasurement)
                 sim.add_oncomplete_callback(onfinishsimulation)
                 LOGGER.info('sim.add_onmesurement_callback')
-                log_topic = t.simulation_output_topic(sim.simulation_id)
                 LOGGER.info("Querying Alarm topic for alarms")
                 gapps.subscribe(alarms_topic, on_message)
                 gapps.subscribe(log_topic, on_message)
-                print(log_topic)
 
                 while not sim_complete:
                     LOGGER.info('Sleeping')
