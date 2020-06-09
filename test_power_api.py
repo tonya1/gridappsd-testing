@@ -38,6 +38,7 @@ def gappsd() -> GridAPPSD:
     gridappsd.disconnect()
     LOGGER.info('Gridappsd disconnected')
 
+
 def model_files_are_equal(file1, file2):
     with open(file1, 'r') as f1:
         with open(file2, 'r') as f2:
@@ -49,7 +50,12 @@ def model_files_are_equal(file1, file2):
                 return False
 
             if dict1['data']['modelNames'] != dict2['data']['modelNames']:
-                return False
+                if len(dict1['data']['modelNames']) == 0:
+                    return False
+                for key in dict1['data']['modelNames']:
+                    if key not in dict2['data']['modelNames']:
+                        return False
+
 
     return True
 
@@ -66,7 +72,12 @@ def object_files_are_equal(file1, file2):
                 return False
 
             if dict1['data']['results']['bindings'] != dict2['data']['results']['bindings']:
-                return False
+                if len(dict1['data']['results']['bindings']) == 0:
+                    return False
+                for key in dict1['data']['results']['bindings']:
+                    if key not in dict2['data']['results']['bindings']:
+                        return False
+
 
     return True
 
@@ -83,7 +94,11 @@ def object_types_are_equal(file1, file2):
                 return False
 
             if dict1['data']['objectTypes'] != dict2['data']['objectTypes']:
-                return False
+                if len(dict1['data']['objectTypes']) == 0:
+                    return False
+                for key in dict1['data']['objectTypes']:
+                    if key not in dict2['data']['objectTypes']:
+                        return False
 
     return True
 
@@ -100,7 +115,11 @@ def models_are_equal(file1, file2):
                 return False
 
             if dict1['data']['models'] != dict2['data']['models']:
-                return False
+                if len(dict1['data']['models']) == 0:
+                    return False
+                for key in dict1['data']['models']:
+                    if key not in dict2['data']['models']:
+                        return False
 
     return True
 
@@ -117,7 +136,11 @@ def query_data_equal(file1, file2):
                 return False
 
             if dict1['data']['results']['bindings'] != dict2['data']['results']['bindings']:
-                return False
+                if len(dict1['data']['results']['bindings']) == 0:
+                    return False
+                for key in dict1['data']['results']['bindings']:
+                    if key not in dict2['data']['results']['bindings']:
+                        return False
 
     return True
 
@@ -132,7 +155,7 @@ def test_power_model_names():
 
             LOGGER.info('Performing object query')
             with open("/tmp/output/power2.json", 'w') as f:
-                obj = '_0f6f3735-b297-46aa-8861-547d3cd0dee9'
+                obj = '_46EA069B-F08C-4945-9C08-8F7CABECCF5C'
                 r2 = gapps.query_object(obj, model_id=None)
                 f.write(json.dumps(r2, indent=4, sort_keys=True))
 

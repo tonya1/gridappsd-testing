@@ -11,11 +11,41 @@
                 {
                     "property": {
                         "type": "uri",
+                        "value": "http://iec.ch/TC57/CIM100#ConnectivityNode.ConnectivityNodeContainer"
+                    },
+                    "value": {
+                        "type": "uri",
+                        "value": "http://localhost:8889/bigdata/sparql#_4F76A5F9-271D-9EB8-5E31-AA362D86F2C3"
+                    }
+                },
+                {
+                    "property": {
+                        "type": "uri",
+                        "value": "http://iec.ch/TC57/CIM100#ConnectivityNode.OperationalLimitSet"
+                    },
+                    "value": {
+                        "type": "uri",
+                        "value": "http://localhost:8889/bigdata/sparql#_B42A7C50-D9A6-4D9B-A8B1-77832E42906D"
+                    }
+                },
+                {
+                    "property": {
+                        "type": "uri",
+                        "value": "http://iec.ch/TC57/CIM100#ConnectivityNode.TopologicalNode"
+                    },
+                    "value": {
+                        "type": "uri",
+                        "value": "http://localhost:8889/bigdata/sparql#_973FDFE4-BA41-4B00-A083-79192334A4F5"
+                    }
+                },
+                {
+                    "property": {
+                        "type": "uri",
                         "value": "http://iec.ch/TC57/CIM100#IdentifiedObject.mRID"
                     },
                     "value": {
                         "type": "literal",
-                        "value": "_0f6f3735-b297-46aa-8861-547d3cd0dee9"
+                        "value": "_46EA069B-F08C-4945-9C08-8F7CABECCF5C"
                     }
                 },
                 {
@@ -25,47 +55,7 @@
                     },
                     "value": {
                         "type": "literal",
-                        "value": "ACLineSegment_ln5744325-1_Power"
-                    }
-                },
-                {
-                    "property": {
-                        "type": "uri",
-                        "value": "http://iec.ch/TC57/CIM100#Measurement.measurementType"
-                    },
-                    "value": {
-                        "type": "literal",
-                        "value": "VA"
-                    }
-                },
-                {
-                    "property": {
-                        "type": "uri",
-                        "value": "http://iec.ch/TC57/CIM100#Measurement.phases"
-                    },
-                    "value": {
-                        "type": "uri",
-                        "value": "http://iec.ch/TC57/CIM100#PhaseCode.B"
-                    }
-                },
-                {
-                    "property": {
-                        "type": "uri",
-                        "value": "http://iec.ch/TC57/CIM100#Measurement.PowerSystemResource"
-                    },
-                    "value": {
-                        "type": "uri",
-                        "value": "http://localhost:8889/bigdata/sparql#_5A2DD359-428D-4145-BC9A-EF14D46C8898"
-                    }
-                },
-                {
-                    "property": {
-                        "type": "uri",
-                        "value": "http://iec.ch/TC57/CIM100#Measurement.Terminal"
-                    },
-                    "value": {
-                        "type": "uri",
-                        "value": "http://localhost:8889/bigdata/sparql#_3CF8E664-841F-4D4C-AF16-1CEB147C5AE7"
+                        "value": "p827512"
                     }
                 },
                 {
@@ -75,12 +65,12 @@
                     },
                     "value": {
                         "type": "uri",
-                        "value": "http://iec.ch/TC57/CIM100#Analog"
+                        "value": "http://iec.ch/TC57/CIM100#ConnectivityNode"
                     }
                 }
             ]
         }
     },
-    "id": "1001829898",
+    "id": "835013065",
     "responseComplete": true
 }
