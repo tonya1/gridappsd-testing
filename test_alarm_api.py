@@ -47,29 +47,51 @@ def gappsd() -> GridAPPSD:
 #    with startup_containers():
 #        g = GridAPPSD()
 #        assert g.connected
+# global tapchanger_value
 
+tapchanger_value = -1
+alarm_count = 0
+#outage_mrid = {}
 
 def on_message(headers, message):
-
+    global tapchanger_value
+    global alarm_count
+    #global outage_mrid
     if "gridappsd-alarms" in headers["destination"]:
-
+        # print(headers)
         if "_302E3119-B3ED-46A1-87D5-EBC8496357DF" or "_A0E0AB93-FFC2-471B-B84C-19015CB15ED2" or "_2FA4B41B-C31B-4861-B8BB-941A8DFD1B41" in \
                 message['equipment_mrid']:
             for y in message:
                 print(y)
                 if "Open" in y['value']:
                     LOGGER.info('Alarms created')
+                    alarm_count += 1
 
     if "gridappsd-alarms" not in headers["destination"]:
-        #print(headers)
+        # print(headers)
         measurement_values = message["message"]["measurements"]
         for x in measurement_values:
             # print(measurement_values)
             m = measurement_values[x]
             if m.get("measurement_mrid") == "_0f8202ca-a4bf-4c7e-9302-601919c09992":
-                if m.get("value") == 10:
-                    #print(m.get("value"))
-                    LOGGER.info('Tap Changer Value changed from 5 to 10')
+                if m.get("value") != tapchanger_value:
+                    tapchanger_value = m.get("value")
+                    LOGGER.info(f"Tap Changer Value changed to {tapchanger_value}")
+                                    
+            # elif m.get("measurement_mrid") != outage_mrid:
+            #     outage_mrid = "_0f8202ca-a4bf-4c7e-9302-601919c09992"
+            #     print("mRID not present")
+
+
+            # if "_0f8202ca-a4bf-4c7e-9302-601919c09992" not in m.get("measurement_mrid"):
+            #     print("mRID not there")
+            #     with open("./input.txt", 'w') as f:
+            #         f.write(x)
+
+            # if m.get("measurement_mrid") == "_E44571D4-52CE-4ACE-9012-37DEBF17FCF8":
+            #     print("mRID not there")
+            #     with open("./input.txt", 'a') as f:
+            #         f.write(x)
 
 
 @pytest.mark.parametrize("sim_config_file, sim_result_file", [
@@ -92,10 +114,9 @@ def test_alarm_output(sim_config_file, sim_result_file):
 
                 def onmeasurement(sim, timestep, measurements):
                     nonlocal rcvd_measurement
-                    #if not rcvd_measurement:
+                    # if not rcvd_measurement:
                     rcvd_measurement = True
                     LOGGER.info('A measurement happened at %s', timestep)
-
 
                 def onfinishsimulation(sim):
                     nonlocal sim_complete
@@ -108,20 +129,29 @@ def test_alarm_output(sim_config_file, sim_result_file):
 
                 sim = Simulation(gapps, run_config)
 
-                sim.start_simulation()
                 LOGGER.info('Starting the  simulation')
-                print(sim.simulation_id)
-                alarms_topic = t.service_output_topic('gridappsd-alarms', sim.simulation_id)
-                log_topic = t.simulation_output_topic(sim.simulation_id)
-                print(alarms_topic)
-                print(log_topic)
                 sim.add_onmesurement_callback(onmeasurement)
                 sim.add_oncomplete_callback(onfinishsimulation)
                 LOGGER.info('sim.add_onmesurement_callback')
                 LOGGER.info("Querying Alarm topic for alarms")
+                sim.start_simulation()
+                print(sim.simulation_id)
+                alarms_topic = t.service_output_topic('gridappsd-alarms', sim.simulation_id)
+                log_topic = t.simulation_output_topic(sim.simulation_id)
+                input_topic = t.simulation_input_topic(sim.simulation_id)
                 gapps.subscribe(alarms_topic, on_message)
                 gapps.subscribe(log_topic, on_message)
+                # gapps.subscribe(input_topic, on_message)
 
                 while not sim_complete:
                     LOGGER.info('Sleeping')
                     sleep(30)
+
+
+def test_tap_changer():
+    global tapchanger_value
+    assert tapchanger_value == 10, "Tap Changer value is not as expected"
+
+def test_alarm_count():
+    global alarm_count
+    assert alarm_count == 3, "Three Alarms were not generated"
