@@ -27,9 +27,9 @@ def startup_containers(spec=None):
 
     yield
 
-    # LOGGER.info('Stopping gridappsd containers')
-    # docker_down()
-    # LOGGER.info('Containers stopped')
+    LOGGER.info('Stopping gridappsd containers')
+    docker_down()
+    LOGGER.info('Containers stopped')
 
 
 @contextmanager
@@ -51,12 +51,17 @@ def gappsd() -> GridAPPSD:
 
 tapchanger_value = -1
 alarm_count = 0
-#outage_mrid = {}
+outage_mrid = ""
+count1 = 0
+count2 = 0
+
 
 def on_message(headers, message):
     global tapchanger_value
     global alarm_count
-    #global outage_mrid
+    global outage_mrid
+    global count1
+    global count2
     if "gridappsd-alarms" in headers["destination"]:
         # print(headers)
         if "_302E3119-B3ED-46A1-87D5-EBC8496357DF" or "_A0E0AB93-FFC2-471B-B84C-19015CB15ED2" or "_2FA4B41B-C31B-4861-B8BB-941A8DFD1B41" in \
@@ -76,12 +81,17 @@ def on_message(headers, message):
             if m.get("measurement_mrid") == "_0f8202ca-a4bf-4c7e-9302-601919c09992":
                 if m.get("value") != tapchanger_value:
                     tapchanger_value = m.get("value")
-                    LOGGER.info(f"Tap Changer Value changed to {tapchanger_value}")
-                                    
-            # elif m.get("measurement_mrid") != outage_mrid:
-            #     outage_mrid = "_0f8202ca-a4bf-4c7e-9302-601919c09992"
-            #     print("mRID not present")
 
+                    LOGGER.info(f"Tap Changer Value changed to {tapchanger_value}")
+                count2 += 1
+
+
+            if m.get("measurement_mrid") == "_4b707748-2846-4517-92f6-fa6c3fbdd1ed":
+                count1 += 1
+
+            elif m.get("measurement_mrid") == outage_mrid:
+                outage_mrid = "_0f8202ca-a4bf-4c7e-9302-601919c09992"
+                print("mRID not present")
 
             # if "_0f8202ca-a4bf-4c7e-9302-601919c09992" not in m.get("measurement_mrid"):
             #     print("mRID not there")
@@ -99,6 +109,7 @@ def on_message(headers, message):
 
 ])
 def test_alarm_output(sim_config_file, sim_result_file):
+
     simulation_id = None
     sim_config_file = os.path.join(os.path.dirname(__file__), f"simulation_config_files/{sim_config_file}")
     sim_result_file = os.path.join(os.path.dirname(__file__), f"simulation_baseline_files/{sim_result_file}")
@@ -148,9 +159,15 @@ def test_alarm_output(sim_config_file, sim_result_file):
                     sleep(30)
 
 
+
 def test_tap_changer():
     global tapchanger_value
+    global count1
+    global count2
+    print('A', count2)
+    print('B', count1)
     assert tapchanger_value == 10, "Tap Changer value is not as expected"
+
 
 def test_alarm_count():
     global alarm_count

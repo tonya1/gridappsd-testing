@@ -41,7 +41,7 @@ def gappsd() -> GridAPPSD:
 
 
 @pytest.mark.parametrize("sim_config_file, sim_result_file", [
-    ("9500-timeseries-config.json", "9500-simulation.json")
+    ("config.json", "9500-simulation.json")
     # ("123-config.json", "123-simulation.json"),
     # ("13-node-config.json", "13-node-sim.json"),
     # , ("t3-p1-config.json", "t3-p1.json"),
@@ -106,6 +106,8 @@ def test_timeseries_output(sim_config_file, sim_result_file):
                 LOGGER.info('Querying simulation data from timeseries')
                 q = gapps.get_response(t.TIMESERIES, query2, timeout=300)
                 LOGGER.info('Simulation data received for Timeseries API')
+                file2 = open("./out-input.txt", 'w')
+                file2.write(json.dumps(q))
                 assert "hasSimulationMessageType" in q["data"][0], "Simulation data query does not have expected output"
                 LOGGER.info('Simulation data query has expected output')
 
