@@ -211,12 +211,13 @@ def test_mRIDs():
                             list_of_mismatch.append(i + "_" + j + "_value")
                     elif j == "angle":
                         if (abs(dict2["data"][i][j]) - abs(dict1["data"][i][j])) > 0.1 or 0:
-                            # print(abs(dict2["data"][i][j]), abs(dict1["data"][i][j]),abs(dict2["data"][i][j]) - abs(dict1["data"][i][j]))
+                            print(abs(dict2["data"][i][j]), abs(dict1["data"][i][j]),abs(dict2["data"][i][j]) - abs(dict1["data"][i][j]))
                             list_of_mismatch.append(i + "_" + j + "_value")
                     else:
-                        if (abs(dict2["data"][i][j]) - abs(
-                                dict1["data"][i][j])) >= 0.0001:  # "Values do not match for" + j
+                        if (abs(dict2["data"][i][j]) - abs(dict1["data"][i][j])) >= 0.0001:  # "Values do not match for" + j
                             list_of_mismatch.append(i + "_" + j + "_value")
+                            print(abs(dict2["data"][i][j]), abs(dict1["data"][i][j]),
+                                  abs(dict2["data"][i][j]) - abs(dict1["data"][i][j]))
                 else:
                     list_of_mismatch.append(i + "_" + j)
                     print(j + "does not exist in" + i)
