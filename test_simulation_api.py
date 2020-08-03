@@ -44,7 +44,7 @@ pause_msg = []
 resume_msg = []
 
 file1 = "/tmp/output/simulation.output"
-file2 = "./simulation_baseline_files/13-node-sim.output"
+file2 = "./simulation_baseline_files/123-simulation.output"
 
 
 def on_message(self, message):
@@ -73,9 +73,9 @@ def on_message(self, message):
 
 
 @pytest.mark.parametrize("sim_config_file, sim_result_file", [
-    # ("9500-config.json", "9500-simulation.output")
-    # ("123-config.json", "123-simulation.output"),
-    ("13-new.json", "13-node-sim.output"),
+    ("9500-config.json", "9500-simulation.output")
+    #("123-config.json", "123-simulation.output"),
+    #("13-new.json", "13-node-sim.output"),
 ])
 def test_simulation_output(sim_config_file, sim_result_file):
     sim_config_file = os.path.join(os.path.dirname(__file__), f"simulation_config_files/{sim_config_file}")
@@ -86,7 +86,7 @@ def test_simulation_output(sim_config_file, sim_result_file):
     with startup_containers():
         # Allow proven to come up
         sleep(30)
-        starttime = int(time())
+        #starttime = int(time())
 
         with gappsd() as gapps:
             os.makedirs("/tmp/output", exist_ok=True)
@@ -100,7 +100,7 @@ def test_simulation_output(sim_config_file, sim_result_file):
                 with open(sim_config_file) as fp:
                     LOGGER.info('Reading config')
                     run_config = json.load(fp)
-                    run_config["simulation_config"]["start_time"] = str(starttime)
+                   # run_config["simulation_config"]["start_time"] = str(starttime)
 
                 sim = Simulation(gapps, run_config)
 
@@ -114,7 +114,7 @@ def test_simulation_output(sim_config_file, sim_result_file):
                         LOGGER.debug("Pausing sim now")
                         sim.pause()
                         are_we_paused = True
-                        LOGGER.debug(f"ARWEPAUSED {are_we_paused}")
+                        LOGGER.debug(f"WE ARE PAUSED {are_we_paused}")
                         # Setting up so if we get another measurement wheil we
                         # are paused we know it
                         rcvd_measurement = False
@@ -140,7 +140,7 @@ def test_simulation_output(sim_config_file, sim_result_file):
                     sim_complete = True
                     LOGGER.info('Simulation Complete')
 
-                LOGGER.info(f"Start time is {starttime}")
+               # LOGGER.info(f"Start time is {starttime}")
                 LOGGER.info('Loading config')
 
                 # tm: typo in add_onmesurement
@@ -168,7 +168,7 @@ def test_simulation_output(sim_config_file, sim_result_file):
                     paused_seconds += 1
 
                     # s
-                    if paused_seconds > 30:
+                    if paused_seconds > 120:
                         LOGGER.info('Resuming simulation')
                         sim.resume()
                         LOGGER.info('Resumed simulation')
