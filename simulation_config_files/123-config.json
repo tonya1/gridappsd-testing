@@ -10,8 +10,8 @@
     ]
   },
   "simulation_config": {
-    "start_time": "1248148800",
-    "duration": "60",
+    "start_time": "1593118960",
+    "duration": "120",
     "simulator": "GridLAB-D",
     "timestep_frequency": 1000,
     "timestep_increment": 1000,
@@ -27,5 +27,11 @@
       "randomize_zipload_fractions": false,
       "use_houses": false
     }
-  }
+  },
+   "test_config":{
+       "events":[],
+       "appId":""
+
+},
+   "service_configs":[]
 }
