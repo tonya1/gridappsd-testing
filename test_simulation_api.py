@@ -43,8 +43,8 @@ json_msg = []
 pause_msg = []
 resume_msg = []
 
-file1 = "/tmp/output/simulation.output"
-file2 = "./simulation_baseline_files/123-simulation.output"
+# file1 = "/tmp/gridappsd-output/simulation.output"
+# file2 = "./simulation_baseline_files/9500-simulation.output"
 
 
 def on_message(self, message):
@@ -73,9 +73,9 @@ def on_message(self, message):
 
 
 @pytest.mark.parametrize("sim_config_file, sim_result_file", [
-    ("9500-config.json", "9500-simulation.output")
+    #("9500-config.json", "9500-simulation.output")
     #("123-config.json", "123-simulation.output"),
-    #("13-node-config.json", "13-node-sim.output"),
+    ("13-node-config.json", "13-node-sim.output"),
 ])
 def test_simulation_output(gridappsd_client, sim_config_file, sim_result_file):
     sim_config_file = os.path.join(os.path.dirname(__file__), f"simulation_config_files/{sim_config_file}")
@@ -193,51 +193,51 @@ def test_simulation_output(gridappsd_client, sim_config_file, sim_result_file):
             sleep(5)
 
 
-def test_dictsEqual():
-    with open(file1, 'r') as f1:
-        with open(file2, 'r') as f2:
-            dict1 = json.load(f1)
-            dict2 = json.load(f2)
-    assert len(dict1) == len(dict2), "Lengths do not match"
-    # print("Lengths of the dictionaries are same")
+# def test_dictsEqual():
+#     with open(file1, 'r') as f1:
+#         with open(file2, 'r') as f2:
+#             dict1 = json.load(f1)
+#             dict2 = json.load(f2)
+#     assert len(dict1) == len(dict2), "Lengths do not match"
+#     # print("Lengths of the dictionaries are same")
 
 
-def test_mRIDs():
-    with open(file1, 'r') as f1:
-        with open(file2, 'r') as f2:
-            dict1 = json.load(f1)
-            dict2 = json.load(f2)
-    list_of_mismatch = []  # {"i":[],"j":[]}
-
-    for i in dict1["data"].keys():
-        if i in dict2["data"].keys():
-            for j in dict1["data"][i].keys():
-                if j in dict2["data"][i].keys():
-                    if j == "measurement_mrid":
-                        if dict2["data"][i][j] != dict1["data"][i][j]:  # ,"mRIDS do not match"
-                            list_of_mismatch.append(i + "_" + j + "_value")
-                    elif j == "value":
-                        if dict2["data"][i][j] != dict1["data"][i][j]:  # , "Values do not match"
-                            list_of_mismatch.append(i + "_" + j + "_value")
-                    elif j == "angle":
-                        if (abs(dict2["data"][i][j]) - abs(dict1["data"][i][j])) > 0.1 or 0:
-                            print(abs(dict2["data"][i][j]), abs(dict1["data"][i][j]),abs(dict2["data"][i][j]) - abs(dict1["data"][i][j]))
-                            list_of_mismatch.append(i + "_" + j + "_value")
-                    else:
-                        if (abs(dict2["data"][i][j]) - abs(dict1["data"][i][j])) >= 0.0001:  # "Values do not match for" + j
-                            list_of_mismatch.append(i + "_" + j + "_value")
-                            print(abs(dict2["data"][i][j]), abs(dict1["data"][i][j]),
-                                  abs(dict2["data"][i][j]) - abs(dict1["data"][i][j]))
-                else:
-                    list_of_mismatch.append(i + "_" + j)
-                    print(j + "does not exist in" + i)
-
-        else:
-            print(i + " mRID not present in simulation output")
-            list_of_mismatch.append(i)
-            print("Failed")
-    # print("list of mRIDS not present are" + str(list_of_mismatch))
-    assert len(list_of_mismatch) == 0, "Number of mismatches are :" + str(list_of_mismatch)
+# def test_mRIDs():
+#     with open(file1, 'r') as f1:
+#         with open(file2, 'r') as f2:
+#             dict1 = json.load(f1)
+#             dict2 = json.load(f2)
+#     list_of_mismatch = []  # {"i":[],"j":[]}
+#
+#     for i in dict1["data"].keys():
+#         if i in dict2["data"].keys():
+#             for j in dict1["data"][i].keys():
+#                 if j in dict2["data"][i].keys():
+#                     if j == "measurement_mrid":
+#                         if dict2["data"][i][j] != dict1["data"][i][j]:  # ,"mRIDS do not match"
+#                             list_of_mismatch.append(i + "_" + j + "_value")
+#                     elif j == "value":
+#                         if dict2["data"][i][j] != dict1["data"][i][j]:  # , "Values do not match"
+#                             list_of_mismatch.append(i + "_" + j + "_value")
+#                     elif j == "angle":
+#                         if (abs(dict2["data"][i][j]) - abs(dict1["data"][i][j])) > 0.1 or 0:
+#                             print(abs(dict2["data"][i][j]), abs(dict1["data"][i][j]),abs(dict2["data"][i][j]) - abs(dict1["data"][i][j]))
+#                             list_of_mismatch.append(i + "_" + j + "_value")
+#                     else:
+#                         if (abs(dict2["data"][i][j]) - abs(dict1["data"][i][j])) >= 0.0001:  # "Values do not match for" + j
+#                             list_of_mismatch.append(i + "_" + j + "_value")
+#                             print(abs(dict2["data"][i][j]), abs(dict1["data"][i][j]),
+#                                   abs(dict2["data"][i][j]) - abs(dict1["data"][i][j]))
+#                 else:
+#                     list_of_mismatch.append(i + "_" + j)
+#                     print(j + "does not exist in" + i)
+#
+#         else:
+#             print(i + " mRID not present in simulation output")
+#             list_of_mismatch.append(i)
+#             print("Failed")
+#     # print("list of mRIDS not present are" + str(list_of_mismatch))
+#     assert len(list_of_mismatch) == 0, "Number of mismatches are :" + str(len(list_of_mismatch)) + str(list_of_mismatch)
 
 
 def test_pause():
