@@ -9,7 +9,7 @@
     },
     "simulation_config": {
         "start_time": "1373814000",
-        "duration": "600",
+        "duration": "120",
         "simulator": "GridLAB-D",
         "timestep_frequency": 1000,
         "timestep_increment": 1000,
@@ -32,85 +32,85 @@
                 "message": {
                     "forward_differences": [
                         {
-                            "object": "_302E3119-B3ED-46A1-87D5-EBC8496357DF",
+                            "object": "_792127B0-9B3E-43EC-9D23-FD46F5A2F20D",
                             "attribute": "Switch.open",
                             "value": 1
                         }
                     ],
                     "reverse_differences": [
                         {
-                            "object": "_302E3119-B3ED-46A1-87D5-EBC8496357DF",
+                            "object": "_792127B0-9B3E-43EC-9D23-FD46F5A2F20D",
                             "attribute": "Switch.open",
                             "value": 0
                         }
                     ]
                 },
                 "event_type": "ScheduledCommandEvent",
-                "occuredDateTime": 1373814120,
-                "stopDateTime": 1373815100
+                "occuredDateTime": 1373814030,
+                "stopDateTime": 1373814045
             },
             {
                 "message": {
                     "forward_differences": [
                         {
-                            "object": "_A0E0AB93-FFC2-471B-B84C-19015CB15ED2",
+                            "object": "_28CFA3B0-5D09-4154-BC5A-BD0C45E9530D",
                             "attribute": "Switch.open",
                             "value": 1
                         }
                     ],
                     "reverse_differences": [
                         {
-                            "object": "_A0E0AB93-FFC2-471B-B84C-19015CB15ED2",
+                            "object": "_28CFA3B0-5D09-4154-BC5A-BD0C45E9530D",
                             "attribute": "Switch.open",
                             "value": 0
                         }
                     ]
                 },
                 "event_type": "ScheduledCommandEvent",
-                "occuredDateTime": 1373814125,
-                "stopDateTime": 1373815101
+                "occuredDateTime": 1373814040,
+                "stopDateTime": 1373814055
             },
             {
                 "message": {
                     "forward_differences": [
                         {
-                            "object": "_2FA4B41B-C31B-4861-B8BB-941A8DFD1B41",
+                            "object": "_B2C95152-D6F7-4702-9910-E2543FB9B4F7",
                             "attribute": "Switch.open",
                             "value": 1
                         }
                     ],
                     "reverse_differences": [
                         {
-                            "object": "_2FA4B41B-C31B-4861-B8BB-941A8DFD1B41",
+                            "object": "_B2C95152-D6F7-4702-9910-E2543FB9B4F7",
                             "attribute": "Switch.open",
                             "value": 0
                         }
                     ]
                 },
                 "event_type": "ScheduledCommandEvent",
-                "occuredDateTime": 1373814125,
-                "stopDateTime": 1373815102
+                "occuredDateTime": 1373814040,
+                "stopDateTime": 1373814065
             },
             {
                 "message": {
                     "forward_differences": [
                         {
-                            "object": "_E44571D4-52CE-4ACE-9012-37DEBF17FCF8",
+                            "object": "_5D67EBEE-9158-4C56-9E39-12A9AC0D7B8D",
                             "attribute": "TapChanger.step",
                             "value": 10
                         }
                     ],
                     "reverse_differences": [
                         {
-                            "object": "_E44571D4-52CE-4ACE-9012-37DEBF17FCF8",
+                            "object": "_5D67EBEE-9158-4C56-9E39-12A9AC0D7B8D",
                             "attribute": "TapChanger.step",
                             "value": 5
                         }
                     ]
                 },
                 "event_type": "ScheduledCommandEvent",
-                "occuredDateTime": 1373814200,
-                "stopDateTime": 1373817103
+                "occuredDateTime": 1373814050,
+                "stopDateTime": 1373814100
             }
         ],
         "appId": ""
