@@ -124,6 +124,8 @@ def query_data_equal(file1, file2):
 
 def test_power_model_names(gridappsd_client):
     gapps = gridappsd_client
+    # Allow blazegraph to come up
+    sleep(30)
     os.makedirs("/tmp/output", exist_ok=True)
     LOGGER.info('Performing model name query')
     with open("/tmp/output/power.json", 'w') as f:
