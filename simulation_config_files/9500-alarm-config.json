@@ -1,54 +1,133 @@
 {
-  "power_system_config": {
-    "GeographicalRegion_name": "_73C512BD-7249-4F50-50DA-D93849B89C43",
-    "SubGeographicalRegion_name": "_A1170111-942A-6ABD-D325-C64886DC4D7D",
-    "Line_name": "_AAE94E4A-2465-6F5E-37B1-3E72183A4E44"
-  },
-  "application_config": {
-    "applications": [
-
+    "power_system_config": {
+        "GeographicalRegion_name": "_73C512BD-7249-4F50-50DA-D93849B89C43",
+        "SubGeographicalRegion_name": "_A1170111-942A-6ABD-D325-C64886DC4D7D",
+        "Line_name": "_AAE94E4A-2465-6F5E-37B1-3E72183A4E44"
+    },
+    "application_config": {
+        "applications": []
+    },
+    "simulation_config": {
+        "start_time": "1373814000",
+        "duration": "120",
+        "simulator": "GridLAB-D",
+        "timestep_frequency": 1000,
+        "timestep_increment": 1000,
+        "run_realtime": false,
+        "simulation_name": "test9500new",
+        "power_flow_solver_method": "NR",
+        "model_creation_config": {
+            "load_scaling_factor": 1,
+            "schedule_name": "ieeezipload",
+            "z_fraction": 0,
+            "i_fraction": 1,
+            "p_fraction": 0,
+            "randomize_zipload_fractions": false,
+            "use_houses": false
+        }
+    },
+    "test_config": {
+        "events": [
+            {
+                "message": {
+                    "forward_differences": [
+                        {
+                            "object": "_792127B0-9B3E-43EC-9D23-FD46F5A2F20D",
+                            "attribute": "Switch.open",
+                            "value": 1
+                        }
+                    ],
+                    "reverse_differences": [
+                        {
+                            "object": "_792127B0-9B3E-43EC-9D23-FD46F5A2F20D",
+                            "attribute": "Switch.open",
+                            "value": 0
+                        }
+                    ]
+                },
+                "event_type": "ScheduledCommandEvent",
+                "occuredDateTime": 1373814030,
+                "stopDateTime": 1373814045
+            },
+            {
+                "message": {
+                    "forward_differences": [
+                        {
+                            "object": "_28CFA3B0-5D09-4154-BC5A-BD0C45E9530D",
+                            "attribute": "Switch.open",
+                            "value": 1
+                        }
+                    ],
+                    "reverse_differences": [
+                        {
+                            "object": "_28CFA3B0-5D09-4154-BC5A-BD0C45E9530D",
+                            "attribute": "Switch.open",
+                            "value": 0
+                        }
+                    ]
+                },
+                "event_type": "ScheduledCommandEvent",
+                "occuredDateTime": 1373814040,
+                "stopDateTime": 1373814055
+            },
+            {
+                "message": {
+                    "forward_differences": [
+                        {
+                            "object": "_B2C95152-D6F7-4702-9910-E2543FB9B4F7",
+                            "attribute": "Switch.open",
+                            "value": 1
+                        }
+                    ],
+                    "reverse_differences": [
+                        {
+                            "object": "_B2C95152-D6F7-4702-9910-E2543FB9B4F7",
+                            "attribute": "Switch.open",
+                            "value": 0
+                        }
+                    ]
+                },
+                "event_type": "ScheduledCommandEvent",
+                "occuredDateTime": 1373814040,
+                "stopDateTime": 1373814065
+            },
+            {
+                "message": {
+                    "forward_differences": [
+                        {
+                            "object": "_5D67EBEE-9158-4C56-9E39-12A9AC0D7B8D",
+                            "attribute": "TapChanger.step",
+                            "value": 10
+                        }
+                    ],
+                    "reverse_differences": [
+                        {
+                            "object": "_5D67EBEE-9158-4C56-9E39-12A9AC0D7B8D",
+                            "attribute": "TapChanger.step",
+                            "value": 5
+                        }
+                    ]
+                },
+                "event_type": "ScheduledCommandEvent",
+                "occuredDateTime": 1373814050,
+                "stopDateTime": 1373814100
+            }
+        ],
+        "appId": ""
+    },
+    "service_configs": [
+        {
+            "id": "gridappsd-alarms",
+            "user_options": {
+                "default-perunit-confidence-band": 0.02,
+                "simulate-all": false,
+                "sensors-config": {},
+                "default-normal-value": 100,
+                "random-seed": 0,
+                "default-aggregation-interval": 30,
+                "passthrough-if-not-specified": false,
+                "default-perunit-drop-rate": 0.05
+            }
+        }
     ]
-  },
-  "simulation_config": {
-    "start_time": "1373814000",
-    "duration": "1200",
-    "simulator": "GridLAB-D",
-    "timestep_frequency": 1000,
-    "timestep_increment": 1000,
-    "run_realtime": false,
-    "simulation_name": "test9500new",
-    "power_flow_solver_method": "NR",
-    "model_creation_config": {
-      "load_scaling_factor": 1,
-      "schedule_name": "ieeezipload",
-      "z_fraction": 0,
-      "i_fraction": 1,
-      "p_fraction": 0,
-      "randomize_zipload_fractions": false,
-      "use_houses": false
-    }
-  },
-
-  "test_config": {
-    "events":[{"message":{"forward_differences":[{"object":"_302E3119-B3ED-46A1-87D5-EBC8496357DF","attribute":"Switch.open","value":1}],"reverse_differences":[{"object":"_302E3119-B3ED-46A1-87D5-EBC8496357DF","attribute":"Switch.open","value":0}]},"event_type":"ScheduledCommandEvent","occuredDateTime":1373814120,"stopDateTime":1373817600} ,
-              {"message":{"forward_differences": [{"object": "_A0E0AB93-FFC2-471B-B84C-19015CB15ED2","attribute": "Switch.open","value": 1}],"reverse_differences": [{"object": "_A0E0AB93-FFC2-471B-B84C-19015CB15ED2","attribute": "Switch.open","value": 0}]},  "event_type": "ScheduledCommandEvent","occuredDateTime": 1373814125,"stopDateTime": 1373817600},
-              {"message": {"forward_differences": [{"object": "_2FA4B41B-C31B-4861-B8BB-941A8DFD1B41","attribute": "Switch.open","value": 1}],"reverse_differences": [{"object": "_2FA4B41B-C31B-4861-B8BB-941A8DFD1B41","attribute": "Switch.open","value": 0}]},  "event_type": "ScheduledCommandEvent","occuredDateTime": 1373814125,"stopDateTime": 1373817600},
-              {"message": {"forward_differences": [{"object": "_E44571D4-52CE-4ACE-9012-37DEBF17FCF8","attribute": "TapChanger.step",   "value": 10}],"reverse_differences": [{"object": "_E44571D4-52CE-4ACE-9012-37DEBF17FCF8","attribute":"TapChanger.step","value": 5}]},"event_type": "ScheduledCommandEvent","occuredDateTime": 1373814600,"stopDateTime": 1373817600},
-              {"allOutputOutage": false,"allInputOutage": false,"tag": "mc45mjk2","inputList": [{"name": "vreg3_a","type": "Regulator","mRID": ["_E44571D4-52CE-4ACE-9012-37DEBF17FCF8"],"attribute": "TapChanger.step","phases": [{"phaseLabel": "A","phaseIndex": 0}]}],"outputList": [],"event_type": "CommOutage","startDateTime": 1373814610,"stopDateTime": 1373817600}],
-    "appId": ""
-	},
-  "service_configs": [{
-    "id": "gridappsd-alarms",
-    "user_options": {
-        "default-perunit-confidence-band": 0.02,
-        "simulate-all": false,
-        "sensors-config": {},
-        "default-normal-value": 100,
-        "random-seed": 0,
-        "default-aggregation-interval": 30,
-        "passthrough-if-not-specified": false,
-        "default-perunit-drop-rate": 0.05
-    }
-}]
 }
-

@@ -41,7 +41,7 @@ def gappsd() -> GridAPPSD:
 
 
 @pytest.mark.parametrize("sim_config_file, sim_result_file", [
-    ("config.json", "9500-simulation.json")
+    ("9500-timeseries-config.json", "9500-simulation.json")
     # ("123-config.json", "123-simulation.json"),
     # ("13-node-config.json", "13-node-sim.json"),
     # , ("t3-p1-config.json", "t3-p1.json"),
