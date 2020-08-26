@@ -11,6 +11,7 @@ from gridappsd import GridAPPSD
 from gridappsd.simulation import Simulation
 from gridappsd_docker import docker_up, docker_down
 from gridappsd import topics as t
+from pathlib import Path
 
 LOGGER = logging.getLogger(__name__)
 
@@ -43,6 +44,7 @@ json_msg = []
 pause_msg = []
 resume_msg = []
 
+
 # file1 = "/tmp/gridappsd-output/simulation.output"
 # file2 = "./simulation_baseline_files/9500-simulation.output"
 
@@ -73,23 +75,24 @@ def on_message(self, message):
 
 
 @pytest.mark.parametrize("sim_config_file, sim_result_file", [
-    #("9500-config.json", "9500-simulation.output")
-    #("123-config.json", "123-simulation.output"),
-    ("13-node-config.json", "13-node-sim.output"),
-])
+    ("13-new.json", "13-node-sim.output"),
+    ("123-config.json", "123-simulation.output"),
+    ("9500-config.json", "9500-simulation.output")])
 def test_simulation_output(gridappsd_client, sim_config_file, sim_result_file):
+    global resume_msg
+    global pause_msg
     sim_config_file = os.path.join(os.path.dirname(__file__), f"simulation_config_files/{sim_config_file}")
-    sim_result_file = os.path.join(os.path.dirname(__file__), f"simulation_baseline_files/{sim_result_file}")
+    sim_expected_results_file = os.path.join(os.path.dirname(__file__), f"simulation_baseline_files/{sim_result_file}")
+    sim_actual_result_file = f"/tmp/output/{sim_result_file}"
+    os.makedirs(Path(sim_actual_result_file).parent, exist_ok=True)
     assert os.path.exists(sim_config_file), f"File {sim_config_file} must exist to run simulation test"
     # assert os.path.exists(sim_result_file), f"File {sim_result_file} must exist to run simulation test"
 
     gapps = gridappsd_client
 
-    # Allow proven to come up
     sleep(30)
-    #starttime = int(time())
     os.makedirs("/tmp/output", exist_ok=True)
-    with open("/tmp/output/simulation.output", 'w') as outfile:
+    with open(sim_actual_result_file, 'w') as outfile:
         LOGGER.info('Configuring simulation')
         sim_complete = False
         rcvd_measurement = False
@@ -97,31 +100,20 @@ def test_simulation_output(gridappsd_client, sim_config_file, sim_result_file):
         are_we_paused = False
         received_measurment_count = 0
 
+        LOGGER.info('Loading config')
         with open(sim_config_file) as fp:
             LOGGER.info('Reading config')
             run_config = json.load(fp)
-           # run_config["simulation_config"]["start_time"] = str(starttime)
+        # run_config["simulation_config"]["start_time"] = str(starttime)
 
         sim = Simulation(gapps, run_config)
 
         def onmeasurement(sim, timestep, measurements):
             LOGGER.info('Measurement received at %s', timestep)
             nonlocal rcvd_measurement
-            #nonlocal rcvd_first_measurement
-            #nonlocal are_we_paused
             nonlocal received_measurment_count
-
             received_measurment_count += 1
             try:
-
-                # if not are_we_paused and not rcvd_first_measurement:
-                #     LOGGER.debug("Pausing sim now")
-                #     sim.pause()
-                #     are_we_paused = True
-                #     LOGGER.debug(f"WE ARE PAUSED {are_we_paused}")
-                #     # Setting up so if we get another measurement wheil we
-                #     # are paused we know it
-                #     rcvd_measurement = False
 
                 if not rcvd_measurement:
                     print(f"A measurement happened at {timestep}")
@@ -138,25 +130,21 @@ def test_simulation_output(gridappsd_client, sim_config_file, sim_result_file):
 
         # sleep here until rcvd_measuremnt = True again
 
-        def ontimestep(sim, timestep):
-            print("Timestamp: {}".format(timestep))
+        # def ontimestep(sim, timestep):
+        #    # print("Timestamp: {}".format(timestep))
 
         def onfinishsimulation(sim):
             nonlocal sim_complete
             sim_complete = True
             LOGGER.info('Simulation Complete')
 
-       # LOGGER.info(f"Start time is {starttime}")
-        LOGGER.info('Loading config')
-
-        # tm: typo in add_onmesurement
         LOGGER.info('sim.add_onmesurement_callback')
 
         LOGGER.info('Starting sim')
         sim.start_simulation()
         print(sim.simulation_id)
         sim.add_onmesurement_callback(onmeasurement)
-        sim.add_ontimestep_callback(ontimestep)
+        # sim.add_ontimestep_callback(ontimestep)
         gapps.subscribe(t.simulation_log_topic(sim.simulation_id), on_message)
         sim.add_oncomplete_callback(onfinishsimulation)
         LOGGER.info('sim.add_oncomplete_callback')
@@ -177,7 +165,6 @@ def test_simulation_output(gridappsd_client, sim_config_file, sim_result_file):
             LOGGER.info(f"PAUSED {paused_seconds}")
             paused_seconds += 1
 
-            # s
             if paused_seconds > 30:
                 LOGGER.info('Resuming simulation')
                 sim.resume()
@@ -187,64 +174,52 @@ def test_simulation_output(gridappsd_client, sim_config_file, sim_result_file):
             sleep(1)
 
         assert not are_we_paused, "We should have came out of the paused_seconds > 30"
+        assert "paused" in pause_msg, 'Pause command not called'
+        sleep(10)
+        assert "resumed" in resume_msg, 'Resume command not called'
 
         while not sim_complete:
             LOGGER.info('Sleeping')
             sleep(5)
 
-
-# def test_dictsEqual():
-#     with open(file1, 'r') as f1:
-#         with open(file2, 'r') as f2:
-#             dict1 = json.load(f1)
-#             dict2 = json.load(f2)
-#     assert len(dict1) == len(dict2), "Lengths do not match"
-#     # print("Lengths of the dictionaries are same")
+        are_simulation_results_matching(sim_expected_results_file, sim_actual_result_file)
 
 
-# def test_mRIDs():
-#     with open(file1, 'r') as f1:
-#         with open(file2, 'r') as f2:
-#             dict1 = json.load(f1)
-#             dict2 = json.load(f2)
-#     list_of_mismatch = []  # {"i":[],"j":[]}
-#
-#     for i in dict1["data"].keys():
-#         if i in dict2["data"].keys():
-#             for j in dict1["data"][i].keys():
-#                 if j in dict2["data"][i].keys():
-#                     if j == "measurement_mrid":
-#                         if dict2["data"][i][j] != dict1["data"][i][j]:  # ,"mRIDS do not match"
-#                             list_of_mismatch.append(i + "_" + j + "_value")
-#                     elif j == "value":
-#                         if dict2["data"][i][j] != dict1["data"][i][j]:  # , "Values do not match"
-#                             list_of_mismatch.append(i + "_" + j + "_value")
-#                     elif j == "angle":
-#                         if (abs(dict2["data"][i][j]) - abs(dict1["data"][i][j])) > 0.1 or 0:
-#                             print(abs(dict2["data"][i][j]), abs(dict1["data"][i][j]),abs(dict2["data"][i][j]) - abs(dict1["data"][i][j]))
-#                             list_of_mismatch.append(i + "_" + j + "_value")
-#                     else:
-#                         if (abs(dict2["data"][i][j]) - abs(dict1["data"][i][j])) >= 0.0001:  # "Values do not match for" + j
-#                             list_of_mismatch.append(i + "_" + j + "_value")
-#                             print(abs(dict2["data"][i][j]), abs(dict1["data"][i][j]),
-#                                   abs(dict2["data"][i][j]) - abs(dict1["data"][i][j]))
-#                 else:
-#                     list_of_mismatch.append(i + "_" + j)
-#                     print(j + "does not exist in" + i)
-#
-#         else:
-#             print(i + " mRID not present in simulation output")
-#             list_of_mismatch.append(i)
-#             print("Failed")
-#     # print("list of mRIDS not present are" + str(list_of_mismatch))
-#     assert len(list_of_mismatch) == 0, "Number of mismatches are :" + str(len(list_of_mismatch)) + str(list_of_mismatch)
+def are_simulation_results_matching(sim_output_file, sim_result_file):
+    with open(sim_output_file, 'r') as f1:
+        with open(sim_result_file, 'r') as f2:
+            dict1 = json.load(f1)
+            dict2 = json.load(f2)
+    list_of_mismatch = []  # {"i":[],"j":[]}
 
+    for i in dict1["data"].keys():
+        if i in dict2["data"].keys():
+            for j in dict1["data"][i].keys():
+                if j in dict2["data"][i].keys():
+                    if j == "measurement_mrid":
+                        if dict2["data"][i][j] != dict1["data"][i][j]:  # ,"mRIDS do not match"
+                            list_of_mismatch.append(i + "_" + j + "_value")
+                    elif j == "value":
+                        if dict2["data"][i][j] != dict1["data"][i][j]:  # , "Values do not match"
+                            list_of_mismatch.append(i + "_" + j + "_value")
+                    elif j == "angle":
+                        if (abs(dict2["data"][i][j]) - abs(dict1["data"][i][j])) > 0.1 or 0:
+                            print(abs(dict2["data"][i][j]), abs(dict1["data"][i][j]),
+                                  abs(dict2["data"][i][j]) - abs(dict1["data"][i][j]))
+                            list_of_mismatch.append(i + "_" + j + "_value")
+                    else:
+                        if (abs(dict2["data"][i][j]) - abs(
+                                dict1["data"][i][j])) >= 0.0001:  # "Values do not match for" + j
+                            list_of_mismatch.append(i + "_" + j + "_value")
+                            print(abs(dict2["data"][i][j]), abs(dict1["data"][i][j]),
+                                  abs(dict2["data"][i][j]) - abs(dict1["data"][i][j]))
+                else:
+                    list_of_mismatch.append(i + "_" + j)
+                    print(j + "does not exist in" + i)
 
-def test_pause():
-    global pause_msg
-    assert "paused" in pause_msg, 'Pause command not called'
-
-
-def test_resume():
-    global resume_msg
-    assert "resumed" in resume_msg, 'Resume command not called'
+        else:
+            print(i + " mRID not present in simulation output")
+            list_of_mismatch.append(i)
+            print("Failed")
+    # print("list of mRIDS not present are" + str(list_of_mismatch))
+    assert len(list_of_mismatch) == 0, "Number of mismatches are :" + str(len(list_of_mismatch)) + str(list_of_mismatch)
