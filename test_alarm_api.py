@@ -16,10 +16,12 @@ LOGGER = logging.getLogger(__name__)
 
 tapchanger_value = []
 alarm_count = 0
+mrid_values = {}
 
 def on_message(headers, message):
     global tapchanger_value
     global alarm_count
+    global mrid_values
     
     if "gridappsd-alarms" in headers["destination"]:
         if "ln1047pvfrm_sw" or "ln5001chp_sw" or "ln0895780_sw" in \
@@ -33,7 +35,16 @@ def on_message(headers, message):
         measurement_values = message["message"]["measurements"]
         for x in measurement_values:
             m = measurement_values[x]
-            if m.get("measurement_mrid") == "_48e11ee1-ea9f-4e0c-a6dd-2807a9dbc032":
+
+            # find the tapchanger mrid after an update
+            # try: 
+            #     if mrid_values[m.get("measurement_mrid")] != m.get("value"):
+            #         LOGGER.info (f'{m.get("measurement_mrid")} value changes from {mrid_values[m.get("measurement_mrid")]} to {m.get("value")}')
+            #         mrid_values[m.get("measurement_mrid")] = m.get("value")
+            # except KeyError:
+            #     mrid_values[m.get("measurement_mrid")] = m.get("value")
+            
+            if m.get("measurement_mrid") == "_9c869e50-c9c6-49bb-b1f3-949841a06ed3":
                if not tapchanger_value:
                     LOGGER.info(f'Tap Changer value is {m.get("value")}')
                     tapchanger_value.append(m.get("value"))
