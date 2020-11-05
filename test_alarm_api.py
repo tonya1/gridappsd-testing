@@ -109,8 +109,14 @@ def test_alarm_output(gridappsd_client, sim_config_file, sim_result_file):
 
 def test_tap_changer():
     global tapchanger_value
-    assert tapchanger_value == [4, 10, 5], f"Expected tap changer values [4, 10, 5] received {tapchanger_value}"
+    # commoutage prevents recording of last tap_changer change
+    # assert tapchanger_value == [4, 10, 5], f"Expected tap changer values [4, 10, 5] received {tapchanger_value}"
+    assert tapchanger_value == [4, 10], f"Expected tap changer values [4, 10] received {tapchanger_value}"
 
+def test_comm_outage():
+    global tapchanger_value
+    # commoutage prevents recording of last tap_changer change
+    assert tapchanger_value == [4, 10], f"Comm outage should prevent last tap change value from being recorded.  Expected values [4, 10] received {tapchanger_value}"
 
 def test_alarm_count():
     global alarm_count
