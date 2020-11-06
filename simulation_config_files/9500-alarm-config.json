@@ -9,7 +9,7 @@
     },
     "simulation_config": {
         "start_time": "1373814000",
-        "duration": "120",
+        "duration": "150",
         "simulator": "GridLAB-D",
         "timestep_frequency": 1000,
         "timestep_increment": 1000,
@@ -97,6 +97,42 @@
                         {
                             "object": "_5D67EBEE-9158-4C56-9E39-12A9AC0D7B8D",
                             "attribute": "TapChanger.step",
+                            "value": 4
+                        }
+                    ],
+                    "reverse_differences": [
+                        {
+                            "object": "_5D67EBEE-9158-4C56-9E39-12A9AC0D7B8D",
+                            "attribute": "TapChanger.step",
+                            "value": 10
+                        }
+                    ]
+                },
+                "event_type": "ScheduledCommandEvent",
+                "occuredDateTime": 1373814050,
+                "stopDateTime": 1373814100
+            },
+            {
+                "allInputOutage": false,
+                "allOutputOutage": false,
+                "event_type": "CommOutage",
+                "faultMRID": "_f52aa46c-ce43-4aa4-8888-c1f3e4b684ae",
+                "inputOutageList": [
+                    {
+                        "attribute": "TapChanger.step",
+                        "objectMRID": "_5D67EBEE-9158-4C56-9E39-12A9AC0D7B8D"
+                    }
+                ],
+                "occuredDateTime": 1373814140,
+                "outputOutageList": [],
+                "stopDateTime": 1373814150
+            },
+            {
+                "message": {
+                    "forward_differences": [
+                        {
+                            "object": "_5D67EBEE-9158-4C56-9E39-12A9AC0D7B8D",
+                            "attribute": "TapChanger.step",
                             "value": 10
                         }
                     ],
@@ -109,9 +145,10 @@
                     ]
                 },
                 "event_type": "ScheduledCommandEvent",
-                "occuredDateTime": 1373814050,
-                "stopDateTime": 1373814100
+                "occuredDateTime": 1373814130,
+                "stopDateTime": 1373814150
             }
+
         ],
         "appId": ""
     },
