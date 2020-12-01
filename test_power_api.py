@@ -4,6 +4,7 @@ import logging
 import os
 from time import sleep
 import pytest
+import requests
 
 from gridappsd import GridAPPSD
 from gridappsd import GridAPPSD,topics as t
@@ -125,7 +126,18 @@ def query_data_equal(file1, file2):
 def test_power_model_names(gridappsd_client):
     gapps = gridappsd_client
     # Allow blazegraph to come up
-    sleep(60)
+    status = 0
+    count = 0
+    frequency = 1
+    endpoint = 'http://localhost:8889/bigdata/'
+    while status != 200 and count < 300:
+      status = requests.get(endpoint).status_code
+      LOGGER.info (f'Endpoint {endpoint} status: {status} count: {count}')
+      sleep(frequency)
+      count += frequency
+    assert count < 300, f"Endpoint {endpoint} timeout {count}"
+    assert status == 200, f"Endpoint {endpoint} status {status}"
+
     os.makedirs("/tmp/output", exist_ok=True)
     LOGGER.info('Performing model name query')
     with open("/tmp/output/power.json", 'w') as f:
