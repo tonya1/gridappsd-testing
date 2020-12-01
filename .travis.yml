@@ -25,7 +25,8 @@ jobs:
     name: "Integration Tests"
     script: 
       - mkdir out
-      - pytest -rA --html=out/gridappsd-testing_$(date +"%Y%m%d_%H%M%S")_${TRAVIS_BRANCH}.html --self-contained-html
+      #- pytest -rA --html=out/gridappsd-testing_$(date +"%Y%m%d_%H%M%S")_${TRAVIS_BRANCH}.html --self-contained-html
+      - pytest -rA --html=out/gridappsd-testing_$(date +"%Y%m%d_%H%M%S")_${TRAVIS_BRANCH}.html --self-contained-html test_power_api.py
 
 stages:
   - test
