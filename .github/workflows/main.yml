@@ -1,0 +1,23 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: GRIDAPPSD Integration Test
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.6
+
+      - name: Install dependencies
+        run: pip3 install -r requirements.txt 
+
+      - name: Run Tests
+        run: |
+          mkdir out
+          pytest -rA --html=out/gridappsd-testing_$(date +"%Y%m%d_%H%M%S")_${TRAVIS_BRANCH}.html --self-contained-html
