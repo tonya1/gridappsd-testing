@@ -1,39 +1,103 @@
-import json
-import logging
 import os
-from time import sleep, time
-import yaml
-from gridappsd import topics as t
-
-LOGGER = logging.getLogger(__name__)
-sim_id = "151989"
-log_topic = '/topic/goss.gridappsd.simulation.log'
-request_topic = t.simulation_log_topic(sim_id)
+import time
+import mock
+import pytest
+from gridappsd import GridAPPSD, topics as t
+from gridappsd.loghandler import Logger
 
 
-os.environ['GRIDAPPSD_APPLICATION_ID'] = 'test-logging-service'
-os.environ['GRIDAPPSD_APPLICATION_STATUS'] = 'STARTED'
-os.environ['GRIDAPPSD_SIMULATION_ID'] = sim_id
+@pytest.fixture
+def logger_and_gridapspd(gridappsd_client) -> (Logger, GridAPPSD):
+
+    logger = Logger(gridappsd_client)
+
+    yield logger, gridappsd_client
+
+    logger = None
 
 
-def on_message(self, message):
-    json_msg = yaml.safe_load(str(message))
-    print(json_msg)
-
-
-def test_logging_output(record_property, gridappsd_client):
+@mock.patch.dict(os.environ,
+                 dict(GRIDAPPSD_APPLICATION_ID='sample_app',
+                      GRIDAPPSD_APPLICATION_STATUS='RUNNING'))
+def test_log_stored(record_property, logger_and_gridapspd):
+    logger, gapps = logger_and_gridapspd
     doc_str = """This function queries the database through the gridappsd api.  Specifically checking that the 
-    specific logs are available.  The results are interrogated for the logs pushed to the topic and stored in the 
-    database. The return values of the query are interrogated and the values associated are tested """
+        specific logs are available.  The results are interrogated for multiple logs pushed to the topic and stored in the 
+        database. The return values of the query are interrogated and the values associated are tested """
 
     record_property("gridappsd_doc", doc_str)
-    gapps = gridappsd_client
-    gapps_logger = gapps.get_logger()
-    gapps_logger.info("Publishing logs to database")
-    sleep(5)
-    print("-------------")
-    query = {"query": "select * from log where log_message ='Publishing logs to database'"}
-    print(gapps.get_response(t.LOGS, json.dumps(query), timeout=60))
-    sleep(30)
+    log_data_map = [
+        (logger.debug, "A debug message", "DEBUG"),
+        (logger.info, "An info message", "INFO"),
+        (logger.error, "An error message", "ERROR"),
+        (logger.error, "Another error message", "ERROR"),
+        (logger.info, "Another info message", "INFO"),
+        (logger.debug, "A debug message", "DEBUG")
+    ]
+
+    assert gapps.connected
+
+    # Make the calls to debug
+    for d in log_data_map:
+        d[0](d[1])
+
+    payload = {
+        "query": "select * from log order by timestamp"
+    }
+    time.sleep(5)
+    response = gapps.get_response(t.LOGS, payload, timeout=60)
+    assert response['data'], "There were not any records returned."
+
+    for x in response['data']:
+        if x['source'] != 'sample_app':
+            continue
+        expected = log_data_map.pop(0)
+        assert expected[1] == x['log_message']
+        assert expected[2] == x['log_level']
 
 
+SIMULATION_ID='54321'
+
+ #TODO Ask about loging api for simulations.
+@mock.patch.dict(os.environ,
+                 dict(GRIDAPPSD_APPLICATION_ID='new_sample_app',
+                      GRIDAPPSD_APPLICATION_STATUS='RUNNING',
+                      GRIDAPPSD_SIMULATION_ID=SIMULATION_ID))
+def test_simulation_log_stored(record_property, logger_and_gridapspd):
+    logger, gapps = logger_and_gridapspd
+    doc_str = """This function queries the database through the gridappsd api.  Specifically checking that the 
+    specific logs are available in simulation log.  The results are interrogated for the logs pushed to the topic and 
+    stored in the database. The return values of the query are interrogated and the values associated are tested """
+
+    record_property("gridappsd_doc", doc_str)
+    assert gapps.get_simulation_id() == SIMULATION_ID
+
+    log_data_map = [
+        (logger.debug, "A debug message", "DEBUG"),
+        (logger.info, "An info message", "INFO"),
+        (logger.error, "An error message", "ERROR"),
+        (logger.error, "Another error message", "ERROR"),
+        (logger.info, "Another info message", "INFO"),
+        (logger.debug, "A debug message", "DEBUG")
+    ]
+
+    assert gapps.connected
+
+    # Make the calls to debug
+    for d in log_data_map:
+        d[0](d[1])
+
+    time.sleep(5)
+    payload = {
+        "query": "select * from log"
+    }
+
+    response = gapps.get_response(t.LOGS, payload, timeout=60)
+    assert response['data'], "There were not any records returned."
+
+    for x in response['data']:
+        if x['source'] != 'new_sample_app':
+            continue
+        expected = log_data_map.pop(0)
+        assert expected[1] == x['log_message']
+        assert expected[2] == x['log_level']
