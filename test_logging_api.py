@@ -20,6 +20,9 @@ def logger_and_gridapspd(gridappsd_client) -> (Logger, GridAPPSD):
                  dict(GRIDAPPSD_APPLICATION_ID='sample_app',
                       GRIDAPPSD_APPLICATION_STATUS='RUNNING'))
 def test_log_stored(record_property, logger_and_gridapspd):
+    """This function queries the database through the gridappsd api.  Specifically checking that the 
+    specific logs are available.  The results are interrogated for multiple logs pushed to the topic and stored in the 
+    database. The return values of the query are interrogated and the values associated are tested """
     logger, gapps = logger_and_gridapspd
     doc_str = """This function queries the database through the gridappsd api.  Specifically checking that the 
         specific logs are available.  The results are interrogated for multiple logs pushed to the topic and stored in the 
@@ -64,6 +67,9 @@ SIMULATION_ID='54321'
                       GRIDAPPSD_APPLICATION_STATUS='RUNNING',
                       GRIDAPPSD_SIMULATION_ID=SIMULATION_ID))
 def test_simulation_log_stored(record_property, logger_and_gridapspd):
+    """This function queries the database through the gridappsd api.  Specifically checking that the 
+    specific logs are available in simulation log.  The results are interrogated for the logs pushed to the topic and 
+    stored in the database. The return values of the query are interrogated and the values associated are tested """
     logger, gapps = logger_and_gridapspd
     doc_str = """This function queries the database through the gridappsd api.  Specifically checking that the 
     specific logs are available in simulation log.  The results are interrogated for the logs pushed to the topic and 
