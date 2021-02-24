@@ -54,6 +54,18 @@ def gridappsd_client(docker_dependencies):
 
         gappsd.disconnect()
 
+@pytest.fixture(scope="module")
+def gridappsd_client_module(docker_dependencies):
+    with run_gridappsd_container(True):
+        gappsd = GridAPPSD()
+        gappsd.connect()
+        assert gappsd.connected
+
+        yield gappsd
+
+        gappsd.disconnect()
+
+
 # USED AS EXAMPLES COPIED FROM gridappsd-sensor-simulator
 #
 # @pytest.fixture(scope="module")
