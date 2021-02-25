@@ -122,6 +122,7 @@ def query_data_equal(file1, file2):
     return True
 
 def test_power_model_names(gridappsd_client_module):
+    """Verify all models are present"""
     gapps = gridappsd_client_module
     os.makedirs("/tmp/output", exist_ok=True)
     LOGGER.info('Performing model name query')
@@ -132,6 +133,7 @@ def test_power_model_names(gridappsd_client_module):
 
 
 def test_power_object(gridappsd_client_module):
+    """Verify object exists in model"""
     gapps = gridappsd_client_module
     os.makedirs("/tmp/output", exist_ok=True)
     LOGGER.info('Performing object query')
@@ -139,27 +141,30 @@ def test_power_object(gridappsd_client_module):
         obj = '_46EA069B-F08C-4945-9C08-8F7CABECCF5C'
         r2 = gapps.query_object(obj, model_id=None)
         f.write(json.dumps(r2, indent=4, sort_keys=True))
-    assert object_files_are_equal('/tmp/output/power2.json', './simulation_baseline_files/9500-query2.json'), 'Powergrid API objects differ'
+    assert object_files_are_equal('/tmp/output/power2.json', './simulation_baseline_files/power_api_object.json'), f"Powergrid API objects differ for object {obj}"
 
 def test_power_object_type(gridappsd_client_module):
+    """Verify object types in model"""
     gapps = gridappsd_client_module
     os.makedirs("/tmp/output", exist_ok=True)
     LOGGER.info('Performing object type query')
     with open("/tmp/output/power3.json", 'w') as f:
         r3 = gapps.query_object_types(model_id=None)
         f.write(json.dumps(r3, indent=4, sort_keys=True))
-    assert object_types_are_equal('/tmp/output/power3.json', './simulation_baseline_files/9500-query3.json'), 'Powergrid API object types differ'
+    assert object_types_are_equal('/tmp/output/power3.json', './simulation_baseline_files/power_api_object_types.json'), 'Powergrid API object types differ'
 
 def test_power_query_model_info(gridappsd_client_module):
+    """Verify model information is correct"""
     gapps = gridappsd_client_module
     os.makedirs("/tmp/output", exist_ok=True)
     LOGGER.info('Performing model info query')
     with open("/tmp/output/power4.json", 'w') as f:
         r4 = gapps.query_model_info()
         f.write(json.dumps(r4, indent=4, sort_keys=True))
-    assert models_are_equal('/tmp/output/power4.json', './simulation_baseline_files/9500-query4.json'), 'Powergrid API query model info differs'
+    assert models_are_equal('/tmp/output/power4.json', './simulation_baseline_files/power_api_model_info.json'), 'Powergrid API query model info differs'
 
 def test_power_query_data(gridappsd_client_module):
+    """Verify model data info query is correct"""
     gapps = gridappsd_client_module
     os.makedirs("/tmp/output", exist_ok=True)
     LOGGER.info('Performing model data query')
@@ -167,5 +172,5 @@ def test_power_query_data(gridappsd_client_module):
         query = "select ?feeder_name ?subregion_name ?region_name WHERE {?line r:type c:Feeder.?line c:IdentifiedObject.name  ?feeder_name.?line c:Feeder.NormalEnergizingSubstation ?substation.?substation r:type c:Substation.?substation c:Substation.Region ?subregion.?subregion  c:IdentifiedObject.name  ?subregion_name .?subregion c:SubGeographicalRegion.Region  ?region . ?region   c:IdentifiedObject.name  ?region_name}"
         r5 = gapps.query_data(query, database_type=POWERGRID_MODEL, timeout=30)
         f.write(json.dumps(r5, indent=4, sort_keys=True))
-    assert query_data_equal('/tmp/output/power5.json', './simulation_baseline_files/9500-query5.json'), 'Powergrid API query data differs'
+    assert query_data_equal('/tmp/output/power5.json', './simulation_baseline_files/power_api_model_data.json'), f"Powergrid API query data differs for query {query}"
 
